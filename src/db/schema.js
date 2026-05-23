@@ -54,3 +54,30 @@ export const verification = pgTable("verification", {
     createdAt: timestamp("createdAt").notNull(),
     updatedAt: timestamp("updatedAt").notNull(),
 });
+
+export const site = pgTable("site", {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    domain: text("domain").notNull().unique(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("createdAt").notNull(),
+    updatedAt: timestamp("updatedAt").notNull(),
+});
+
+export const analyticsEvent = pgTable("analytics_event", {
+    id: text("id").primaryKey(),
+    siteToken: text("siteToken")
+        .notNull()
+        .references(() => site.token, { onDelete: "cascade" }),
+    timestamp: timestamp("timestamp").notNull(),
+    url: text("url").notNull(),
+    referrer: text("referrer"),
+    sessionId: text("sessionId").notNull(),
+    country: text("country"),
+    deviceType: text("deviceType"),
+    browser: text("browser"),
+    eventName: text("eventName").notNull(),
+});
