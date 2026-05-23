@@ -61,7 +61,7 @@ export const site = pgTable("site", {
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    domain: text("domain").notNull().unique(),
+    domain: text("domain").notNull(),
     token: text("token").notNull().unique(),
     createdAt: timestamp("createdAt").notNull(),
     updatedAt: timestamp("updatedAt").notNull(),

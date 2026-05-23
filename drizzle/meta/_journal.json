@@ -15,6 +15,13 @@
       "when": 1779532409518,
       "tag": "0001_blue_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779540281686,
+      "tag": "0002_robust_triton",
+      "breakpoints": true
     }
   ]
 }

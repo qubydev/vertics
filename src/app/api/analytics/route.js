@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { analyticsEvent, site } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { nanoid } from "nanoid";
+import crypto from "crypto";
 
 async function getCountry(ip) {
     if (!ip || ip === "::1" || ip === "127.0.0.1") return 'LOCAL';
@@ -34,7 +34,7 @@ export async function POST(req) {
     if (origin) {
         const incoming = new URL(origin).hostname.replace(/^www\./, "");
         const allowed = siteRow.domain.replace(/^www\./, "");
-        if (incoming !== allowed) {
+        if (incoming !== allowed && incoming !== "localhost" && incoming !== "127.0.0.1") {
             return Response.json({ error: "Origin not allowed" }, { status: 403 });
         }
     }
@@ -47,7 +47,7 @@ export async function POST(req) {
     const country = await getCountry(ip);
 
     await db.insert(analyticsEvent).values({
-        id: nanoid(),
+        id: crypto.randomUUID(),
         siteToken: token,
         timestamp: new Date(),
         url,
