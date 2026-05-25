@@ -79,5 +79,6 @@ export const analyticsEvent = pgTable("analytics_event", {
     country: text("country"),
     deviceType: text("deviceType"),
     browser: text("browser"),
+    os: text("os"),
     eventName: text("eventName").notNull(),
 });

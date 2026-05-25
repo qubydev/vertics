@@ -31,7 +31,7 @@ async function getCountry(ip) {
 export async function POST(req) {
     const origin = req.headers.get("origin") || req.headers.get("referer");
     const body = await req.json();
-    const { token, eventName, url, referrer, sessionId, deviceType, browser } = body;
+    const { token, eventName, url, referrer, sessionId, deviceType, browser, os } = body;
 
     if (!token || !eventName || !url || !sessionId) {
         return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -73,6 +73,7 @@ export async function POST(req) {
         country,
         deviceType: deviceType || null,
         browser: browser || null,
+        os: os || null,
         eventName,
     });
 

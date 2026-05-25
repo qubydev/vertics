@@ -198,6 +198,7 @@ export async function GET(req) {
     const countriesMap = new Map();
     const browsersMap = new Map();
     const devicesMap = new Map();
+    const osMap = new Map();
 
     events.forEach(event => {
         uniqueSessions.add(event.sessionId);
@@ -232,6 +233,9 @@ export async function GET(req) {
 
         const device = event.deviceType || "Unknown";
         devicesMap.set(device, (devicesMap.get(device) || 0) + 1);
+
+        const os = event.os || "Unknown";
+        osMap.set(os, (osMap.get(os) || 0) + 1);
     });
 
     const timeseries = Array.from(timeseriesMap.values())
@@ -259,6 +263,8 @@ export async function GET(req) {
             topCountries: sortMap(countriesMap),
             topBrowsers: sortMap(browsersMap),
             topDevices: sortMap(devicesMap)
+            ,
+            topOs: sortMap(osMap)
         }
     });
 }

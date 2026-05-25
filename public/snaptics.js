@@ -22,6 +22,16 @@
         return "Other";
     }
 
+    function getOS() {
+        const ua = navigator.userAgent;
+        if (/Windows NT/i.test(ua)) return "Windows";
+        if (/Mac OS X|Macintosh/i.test(ua)) return "Mac";
+        if (/Android/i.test(ua)) return "Android";
+        if (/iPhone|iPad|iPod/i.test(ua)) return "iOS";
+        if (/Linux/i.test(ua)) return "Linux";
+        return "Other";
+    }
+
     function getSessionId() {
         const key = "sn_sid";
         let sid = sessionStorage.getItem(key);
@@ -56,6 +66,7 @@
             sessionId: getSessionId(),
             deviceType: getDeviceType(),
             browser: getBrowser(),
+            os: getOS(),
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }, extra);
 

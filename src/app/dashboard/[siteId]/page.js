@@ -61,6 +61,45 @@ function StatList({ title, data }) {
     );
 }
 
+function TabStatCard({ leftTitle, rightTitle, leftData, rightData }) {
+    const [active, setActive] = useState("left");
+
+    const data = active === "left" ? leftData : rightData;
+    const title = active === "left" ? leftTitle : rightTitle;
+
+    return (
+        <Card className="w-full flex flex-col h-90 shadow-sm overflow-hidden">
+            <CardHeader className="py-4 border-b shrink-0">
+                <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => setActive("left")} className={`text-sm font-medium ${active === "left" ? "underline" : "text-muted-foreground"}`}>{leftTitle}</button>
+                        <button onClick={() => setActive("right")} className={`text-sm font-medium ${active === "right" ? "underline" : "text-muted-foreground"}`}>{rightTitle}</button>
+                    </div>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Page Views</span>
+                </div>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col px-0 overflow-y-auto">
+                {data.length > 0 ? (
+                    <div className="flex flex-col w-full h-full gap-2 p-4">
+                        {data.map((item, i) => (
+                            <div key={i} className="flex items-center justify-between gap-4 rounded-md bg-muted/30 px-4 py-3">
+                                <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+                                    <span className="truncate text-sm font-medium w-full">{item.name}</span>
+                                </div>
+                                <span className="text-sm font-semibold tabular-nums shrink-0">{item.views}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center flex-1 py-12">
+                        <span className="text-sm text-muted-foreground">No data available</span>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function SiteStatsPage() {
     const router = useRouter();
     const params = useParams();
@@ -80,6 +119,7 @@ export default function SiteStatsPage() {
         topCountries: [],
         topBrowsers: [],
         topDevices: []
+        ,topOs: []
     });
 
     useEffect(() => {
@@ -220,12 +260,22 @@ export default function SiteStatsPage() {
                 </div>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                <StatList title="Pages" data={stats.topPages} />
-                <StatList title="Referrers" data={stats.topReferrers} />
-                <StatList title="Countries" data={stats.topCountries} />
-                <StatList title="Devices" data={stats.topDevices} />
-                <StatList title="Browsers" data={stats.topBrowsers} />
+            <div className="w-full flex flex-col gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                    <StatList title="Pages" data={stats.topPages} />
+                    <StatList title="Referrers" data={stats.topReferrers} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                    <StatList title="Countries" data={stats.topCountries} />
+                    <TabStatCard
+                        leftTitle="Devices"
+                        rightTitle="Browsers"
+                        leftData={stats.topDevices}
+                        rightData={stats.topBrowsers}
+                    />
+                    <StatList title="Operating Systems" data={stats.topOs || []} />
+                </div>
             </div>
 
         </main>
