@@ -3,6 +3,20 @@ import { analyticsEvent, site } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import crypto from "crypto";
 
+function normalizeReferrer(referrer, currentOrigin) {
+    if (!referrer) return null;
+
+    try {
+        const refUrl = new URL(referrer);
+
+        if (currentOrigin && refUrl.origin === currentOrigin) return null;
+
+        return refUrl.hostname.replace(/^www\./, "") || refUrl.origin;
+    } catch {
+        return referrer.replace(/^https?:\/\//, "").replace(/^www\./, "");
+    }
+}
+
 async function getCountry(ip) {
     if (!ip || ip === "::1" || ip === "127.0.0.1") return 'LOCAL';
     try {
@@ -39,6 +53,9 @@ export async function POST(req) {
         }
     }
 
+    const currentOrigin = origin ? new URL(origin).origin : null;
+    const normalizedReferrer = normalizeReferrer(referrer, currentOrigin);
+
     const ip =
         req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
         req.headers.get("x-real-ip") ||
@@ -51,7 +68,7 @@ export async function POST(req) {
         siteToken: token,
         timestamp: new Date(),
         url,
-        referrer: referrer || null,
+        referrer: normalizedReferrer,
         sessionId,
         country,
         deviceType: deviceType || null,

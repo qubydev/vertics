@@ -30,25 +30,23 @@ import {
 
 function StatList({ title, data }) {
     return (
-        <Card className="w-full flex flex-col h-full shadow-sm">
-            <CardHeader className="py-4 border-b">
+        <Card className="w-full flex flex-col h-90 shadow-sm overflow-hidden">
+            <CardHeader className="py-4 border-b shrink-0">
                 <div className="flex justify-between items-center w-full">
                     <CardTitle className="text-sm font-medium">{title}</CardTitle>
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Visitors</span>
                 </div>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col px-0">
+            <CardContent className="flex-1 flex flex-col px-0 overflow-y-auto">
                 {data.length > 0 ? (
-                    <div className="flex flex-col w-full h-full">
+                    <div className="flex flex-col w-full h-full gap-2 p-4">
                         {data.map((item, i) => {
                             return (
-                                <div key={i} className="flex justify-between items-center py-3 px-6 hover:bg-muted/50 transition-colors border-b last:border-0 relative">
-                                    <div className="flex items-center gap-3 relative z-10 w-full overflow-hidden">
+                                <div key={i} className="flex items-center justify-between gap-4 rounded-md bg-muted/30 px-4 py-3">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
                                         <span className="truncate text-sm font-medium w-full">{item.name}</span>
                                     </div>
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <span className="text-sm font-semibold">{item.views}</span>
-                                    </div>
+                                    <span className="text-sm font-semibold tabular-nums shrink-0">{item.views}</span>
                                 </div>
                             )
                         })}
@@ -112,8 +110,10 @@ export default function SiteStatsPage() {
         views: { label: "Page Views", value: stats.views, dataKey: "views" }
     };
 
+    const activeSeriesKey = metricConfig[activeMetric].dataKey;
+
     return (
-        <main className="w-full max-w-[1200px] mx-auto p-4 md:p-8 flex flex-col gap-8 min-h-screen">
+        <main className="w-full max-w-300 mx-auto p-4 md:p-8 flex flex-col gap-8 min-h-screen">
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -132,14 +132,15 @@ export default function SiteStatsPage() {
                 </div>
 
                 <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[180px] h-9">
+                    <SelectTrigger className="w-45 h-9">
                         <SelectValue placeholder="Select timeframe" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="24h">Last 24 hours</SelectItem>
                         <SelectItem value="7d">Last 7 days</SelectItem>
                         <SelectItem value="30d">Last 30 days</SelectItem>
-                        <SelectItem value="all">All time</SelectItem>
+                        <SelectItem value="3mo">Last 3 months</SelectItem>
+                        <SelectItem value="1y">Last year</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -151,7 +152,7 @@ export default function SiteStatsPage() {
                         <button
                             key={key}
                             onClick={() => setActiveMetric(key)}
-                            className={`flex flex-col gap-1 px-6 py-4 min-w-[140px] text-left transition-colors border-r hover:bg-muted/30 ${activeMetric === key
+                            className={`flex flex-col gap-1 px-6 py-4 min-w-35 text-left transition-colors border-r hover:bg-muted/30 ${activeMetric === key
                                     ? "bg-muted/10 shadow-[inset_0_-2px_0_0_hsl(var(--foreground))]"
                                     : ""
                                 }`}
@@ -162,10 +163,10 @@ export default function SiteStatsPage() {
                     ))}
                 </div>
 
-                <div className="w-full h-[350px] p-6 pt-8">
+                <div className="w-full h-87.5 p-6 pt-8">
                     {stats.timeseries.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats.timeseries} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                            <AreaChart data={stats.timeseries} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -202,7 +203,7 @@ export default function SiteStatsPage() {
                                 />
                                 <Area
                                     type="monotone"
-                                    dataKey={metricConfig[activeMetric].dataKey}
+                                    dataKey={activeSeriesKey}
                                     stroke="hsl(var(--primary))"
                                     strokeWidth={2}
                                     fillOpacity={1}

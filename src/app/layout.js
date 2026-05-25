@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
       <head>
         <Script
           src="/snaptics.js"
-          data-token="ca73d31f-bad0-4a63-afea-40bfe995f65a"
+          data-token="35ac739f-e618-48c6-ab84-ac7ae077dfc0"
           data-server="http://localhost:3000"
           strategy="beforeInteractive"
         />

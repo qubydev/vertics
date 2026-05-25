@@ -32,12 +32,27 @@
         return sid;
     }
 
+    function getReferrer() {
+        if (!document.referrer) return null;
+
+        try {
+            const refUrl = new URL(document.referrer);
+            const currentUrl = new URL(location.href);
+
+            if (refUrl.origin === currentUrl.origin) return null;
+
+            return refUrl.hostname.replace(/^www\./, "") || refUrl.origin;
+        } catch {
+            return null;
+        }
+    }
+
     function send(eventName, extra) {
         const payload = Object.assign({
             token,
             eventName,
             url: location.pathname,
-            referrer: document.referrer || null,
+            referrer: getReferrer(),
             sessionId: getSessionId(),
             deviceType: getDeviceType(),
             browser: getBrowser(),
