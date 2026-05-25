@@ -47,11 +47,7 @@ export default function Dashboard() {
 
   async function fetchSites() {
     try {
-      const res = await fetch("/api/site", {
-        headers: {
-          "x-user-id": session.user.id
-        }
-      });
+      const res = await fetch("/api/site");
       if (res.ok) {
         const data = await res.json();
         setSites(data);
@@ -68,7 +64,6 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": session.user.id
         },
         body: JSON.stringify({ name, domain }),
       });
@@ -96,7 +91,6 @@ export default function Dashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": session.user.id
         },
         body: JSON.stringify({
           id: editingSite.id,
@@ -123,9 +117,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`/api/site?id=${deletingSite.id}`, {
         method: "DELETE",
-        headers: {
-          "x-user-id": session.user.id
-        }
+      
       });
 
       if (res.ok) {
