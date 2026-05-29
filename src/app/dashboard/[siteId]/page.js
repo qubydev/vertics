@@ -85,19 +85,21 @@ export default function SiteStatsPage() {
 
             <div className="w-full flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                    <StatList title="Top Pages" data={stats.topPages} metricLabel="Views" />
-                    <StatList title="Referrers" data={stats.topReferrers} metricLabel="Referrals" />
+                    <StatList title="Top Pages" data={stats.topPages} metricLabel="Views" type="page" />
+                    <StatList title="Referrers" data={stats.topReferrers} metricLabel="Referrals" type="referrer" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                    <StatList title="Countries" data={stats.topCountries} metricLabel="Visitors" />
+                    <StatList title="Countries" data={stats.topCountries} metricLabel="Visitors" type="country" />
                     <TabStatCard
                         leftTitle="Devices"
                         rightTitle="Browsers"
                         leftData={stats.topDevices}
                         rightData={stats.topBrowsers}
+                        leftType="device"
+                        rightType="browser"
                     />
-                    <StatList title="Operating Systems" data={stats.topOs || []} metricLabel="Visitors" />
+                    <StatList title="Operating Systems" data={stats.topOs || []} metricLabel="Visitors" type="os" />
                 </div>
             </div>
         </main>

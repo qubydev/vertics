@@ -1,9 +1,38 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Globe, Monitor, Smartphone, Tablet } from "lucide-react";
 
-export function StatList({ title, data, metricLabel = "Visitors" }) {
+export function StatList({ title, data, metricLabel = "Visitors", type = "default" }) {
     const maxVal = data.length > 0 ? Math.max(...data.map(d => d.views || 0)) : 1;
+
+    const getDisplayName = (name) => {
+        if (type === "country" && name !== "LOCAL" && name !== "Unknown") {
+            try {
+                return new Intl.DisplayNames(['en'], { type: 'region' }).of(name.toUpperCase());
+            } catch {
+                return name;
+            }
+        }
+        return name || (type === "page" ? "/" : "Unknown");
+    };
+
+    const getIcon = (name) => {
+        if (type === "referrer") {
+            if (name === "Direct" || !name) return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
+            return <img src={`https://www.google.com/s2/favicons?domain=${name}&sz=32`} alt={name} className="w-4 h-4 rounded-sm shrink-0 bg-white" />;
+        }
+        if (type === "country") {
+            if (name === "LOCAL" || name === "Unknown" || !name) return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
+            return <img src={`https://flagcdn.com/24x18/${name.toLowerCase()}.png`} alt={name} className="w-[18px] h-[13.5px] rounded-[2px] object-cover shrink-0 shadow-sm" />;
+        }
+        if (type === "device") {
+            if (name?.toLowerCase() === "mobile") return <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />;
+            if (name?.toLowerCase() === "tablet") return <Tablet className="w-4 h-4 text-muted-foreground shrink-0" />;
+            return <Monitor className="w-4 h-4 text-muted-foreground shrink-0" />;
+        }
+        return null;
+    };
 
     return (
         <Card className="w-full flex flex-col h-[400px] rounded-xl shadow-none overflow-hidden">
@@ -29,7 +58,8 @@ export function StatList({ title, data, metricLabel = "Visitors" }) {
                                         style={{ width: `calc(${pct}% - 8px)`, opacity: 0.7 }}
                                     />
                                     <div className="flex items-center gap-3 min-w-0 flex-1 z-10">
-                                        <span className="truncate text-sm text-foreground font-medium">{item.name || "/"}</span>
+                                        {getIcon(item.name)}
+                                        <span className="truncate text-sm text-foreground font-medium">{getDisplayName(item.name)}</span>
                                     </div>
                                     <span className="text-sm font-medium text-foreground tabular-nums shrink-0 z-10">{item.views?.toLocaleString()}</span>
                                 </div>
