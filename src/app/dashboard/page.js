@@ -15,6 +15,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Plus, LogOut, Copy, Check, Edit, Trash2, Globe, Search } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -148,25 +157,45 @@ export default function Dashboard() {
     return null;
   }
 
+  const userInitials = session?.user?.name
+    ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+    : "U";
+
   return (
     <main className="w-full max-w-4xl mx-auto p-8 flex flex-col gap-10 min-h-screen">
-      <div className="flex w-full justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <Button
-          variant="secondary"
-          onClick={async () => {
-            await authClient.signOut();
-            router.replace("/");
-          }}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign out
-        </Button>
+      <div className="flex w-full justify-end items-center pb-6">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="rounded-full ring-offset-background transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+            <Avatar>
+              <AvatarImage src={session.user.image} alt={session.user.name} />
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col gap-0.5">
+                <p className="text-sm font-medium text-foreground">{session.user.name}</p>
+                <p className="text-xs text-muted-foreground">{session.user.email}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={async () => {
+                await authClient.signOut();
+                router.replace("/");
+              }}
+            >
+              <LogOut className="w-4 h-4" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="w-full">
         <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4 mb-6">
-          <h2 className="text-xl font-semibold tracking-tight">Your Sites</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Sites</h2>
 
           <div className="flex w-full sm:w-auto items-center gap-3">
             <div className="relative w-full sm:w-64">

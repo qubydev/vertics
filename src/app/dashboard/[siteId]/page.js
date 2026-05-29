@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     AreaChart,
     Area,
@@ -13,7 +22,7 @@ import {
     ResponsiveContainer,
     CartesianGrid
 } from "recharts";
-import { ArrowLeft, Globe } from "lucide-react";
+import { ArrowLeft, Globe, LogOut } from "lucide-react";
 import {
     Select,
     SelectContent,
@@ -152,10 +161,14 @@ export default function SiteStatsPage() {
 
     const activeSeriesKey = metricConfig[activeMetric].dataKey;
 
+    const userInitials = session?.user?.name
+      ? session.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+      : "U";
+
     return (
         <main className="w-full max-w-300 mx-auto p-4 md:p-8 flex flex-col gap-8 min-h-screen">
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex w-full items-center justify-between pb-4">
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
@@ -167,22 +180,52 @@ export default function SiteStatsPage() {
                     </Button>
                     <div className="flex items-center gap-3">
                         <Globe className="w-5 h-5 text-muted-foreground" />
-                        <h1 className="text-xl font-semibold">{site.domain}</h1>
+                        <h1 className="text-lg font-semibold">{site.name || site.domain}</h1>
                     </div>
                 </div>
 
-                <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-45 h-9">
-                        <SelectValue placeholder="Select timeframe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="24h">Last 24 hours</SelectItem>
-                        <SelectItem value="7d">Last 7 days</SelectItem>
-                        <SelectItem value="30d">Last 30 days</SelectItem>
-                        <SelectItem value="3mo">Last 3 months</SelectItem>
-                        <SelectItem value="1y">Last year</SelectItem>
-                    </SelectContent>
-                </Select>
+                <div className="flex items-center gap-3">
+                    <Select value={timeRange} onValueChange={setTimeRange}>
+                        <SelectTrigger className="w-45 h-9">
+                            <SelectValue placeholder="Select timeframe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="24h">Last 24 hours</SelectItem>
+                            <SelectItem value="7d">Last 7 days</SelectItem>
+                            <SelectItem value="30d">Last 30 days</SelectItem>
+                            <SelectItem value="3mo">Last 3 months</SelectItem>
+                            <SelectItem value="1y">Last year</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="rounded-full ring-offset-background transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                            <Avatar>
+                                <AvatarImage src={session.user.image} alt={session.user.name} />
+                                <AvatarFallback>{userInitials}</AvatarFallback>
+                            </Avatar>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel className="font-normal">
+                                <div className="flex flex-col gap-0.5">
+                                    <p className="text-sm font-medium text-foreground">{session.user.name}</p>
+                                    <p className="text-xs text-muted-foreground">{session.user.email}</p>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                variant="destructive"
+                                onClick={async () => {
+                                    await authClient.signOut();
+                                    router.replace("/");
+                                }}
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Log out
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             <Card className="w-full shadow-sm overflow-hidden">

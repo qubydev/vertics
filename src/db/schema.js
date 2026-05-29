@@ -3,6 +3,8 @@ import {
     text,
     boolean,
     timestamp,
+    integer,
+    index,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -11,8 +13,8 @@ export const user = pgTable("user", {
     email: text("email").notNull().unique(),
     emailVerified: boolean("emailVerified").notNull(),
     image: text("image"),
-    createdAt: timestamp("createdAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const session = pgTable("session", {
@@ -24,8 +26,8 @@ export const session = pgTable("session", {
     expiresAt: timestamp("expiresAt").notNull(),
     ipAddress: text("ipAddress"),
     userAgent: text("userAgent"),
-    createdAt: timestamp("createdAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const account = pgTable("account", {
@@ -42,8 +44,8 @@ export const account = pgTable("account", {
     scope: text("scope"),
     idToken: text("idToken"),
     password: text("password"),
-    createdAt: timestamp("createdAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const verification = pgTable("verification", {
@@ -51,8 +53,8 @@ export const verification = pgTable("verification", {
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expiresAt").notNull(),
-    createdAt: timestamp("createdAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const site = pgTable("site", {
@@ -63,22 +65,31 @@ export const site = pgTable("site", {
     name: text("name").notNull(),
     domain: text("domain").notNull(),
     token: text("token").notNull().unique(),
-    createdAt: timestamp("createdAt").notNull(),
-    updatedAt: timestamp("updatedAt").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const analyticsEvent = pgTable("analytics_event", {
     id: text("id").primaryKey(),
-    siteToken: text("siteToken")
+    siteId: text("siteId")
         .notNull()
-        .references(() => site.token, { onDelete: "cascade" }),
-    timestamp: timestamp("timestamp").notNull(),
-    url: text("url").notNull(),
-    referrer: text("referrer"),
+        .references(() => site.id, { onDelete: "cascade" }),
+    timestamp: timestamp("timestamp").notNull().defaultNow(),
+    eventName: text("eventName").notNull(),
+    pathname: text("pathname").notNull(),
+    duration: integer("duration"),
+    visitorId: text("visitorId").notNull(),
     sessionId: text("sessionId").notNull(),
+    referrer: text("referrer"),
+    referrerUrl: text("referrerUrl"),
     country: text("country"),
+    city: text("city"),
     deviceType: text("deviceType"),
     browser: text("browser"),
     os: text("os"),
-    eventName: text("eventName").notNull(),
-});
+}, (table) => ({
+    siteTimeIdx: index("event_site_time_idx").on(table.siteId, table.timestamp),
+    sessionIdx: index("event_session_idx").on(table.sessionId),
+    visitorIdx: index("event_visitor_idx").on(table.visitorId),
+    pathnameIdx: index("event_pathname_idx").on(table.siteId, table.pathname),
+}));

@@ -42,15 +42,22 @@
         return sid;
     }
 
-    function getReferrer() {
-        if (!document.referrer) return null;
+    function getVisitorId() {
+        const key = "sn_vid";
+        let vid = localStorage.getItem(key);
+        if (!vid) {
+            vid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+            localStorage.setItem(key, vid);
+        }
+        return vid;
+    }
 
+    function getReferrerDomain() {
+        if (!document.referrer) return null;
         try {
             const refUrl = new URL(document.referrer);
             const currentUrl = new URL(location.href);
-
             if (refUrl.origin === currentUrl.origin) return null;
-
             return refUrl.hostname.replace(/^www\./, "") || refUrl.origin;
         } catch {
             return null;
@@ -61,9 +68,11 @@
         const payload = Object.assign({
             token,
             eventName,
-            url: location.pathname,
-            referrer: getReferrer(),
+            pathname: location.pathname,
+            referrer: getReferrerDomain(),
+            referrerUrl: document.referrer || null,
             sessionId: getSessionId(),
+            visitorId: getVisitorId(),
             deviceType: getDeviceType(),
             browser: getBrowser(),
             os: getOS(),
