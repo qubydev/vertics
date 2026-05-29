@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { site, analyticsEvent } from "@/db/schema";
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and, gte, desc } from "drizzle-orm";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
 
@@ -74,23 +74,6 @@ export async function GET(req) {
         }
 
         return startOfDay(date).getTime();
-    };
-
-    const normalizeReferrer = (value) => {
-        if (!value || value === "null") return null;
-
-        try {
-            const refUrl = new URL(value);
-
-            const allowedHost = targetSite.domain.replace(/^www\./, "");
-
-            if (refUrl.hostname.replace(/^www\./, "") === allowedHost) return null;
-            if (refUrl.hostname === "localhost" || refUrl.hostname === "127.0.0.1" || refUrl.hostname === "::1") return null;
-
-            return refUrl.hostname.replace(/^www\./, "") || refUrl.origin;
-        } catch {
-            return value.replace(/^https?:\/\//, "").replace(/^www\./, "");
-        }
     };
 
     const buildTimeseriesSeed = () => {
@@ -183,15 +166,19 @@ export async function GET(req) {
         return new Date(0);
     })();
 
+    // Note: You must update your Drizzle query to match the new schema properties. 
+    // analyticsEvent.siteToken -> analyticsEvent.siteId
     const events = await db.select()
         .from(analyticsEvent)
         .where(and(
-            eq(analyticsEvent.siteToken, targetSite.token),
-            gte(analyticsEvent.timestamp, startDate)
+            eq(analyticsEvent.siteId, targetSite.id),
+            gte(analyticsEvent.timestamp, startDate),
+            eq(analyticsEvent.eventName, "pageview") // ensure we only aggregate pageviews
         ));
 
-    const views = events.length;
+    let views = 0;
     const uniqueSessions = new Set();
+    const uniqueVisitors = new Set();
     const timeseriesMap = buildTimeseriesSeed();
     const pagesMap = new Map();
     const referrersMap = new Map();
@@ -201,7 +188,13 @@ export async function GET(req) {
     const osMap = new Map();
 
     events.forEach(event => {
+        views += 1;
         uniqueSessions.add(event.sessionId);
+
+        // Ensure visitorId exists before adding (to gracefully handle older schema data if any)
+        if (event.visitorId) {
+            uniqueVisitors.add(event.visitorId);
+        }
 
         const d = new Date(event.timestamp);
         const timeKey = createBucketKey(d);
@@ -217,12 +210,18 @@ export async function GET(req) {
 
         const tsData = timeseriesMap.get(timeKey);
         tsData.views += 1;
-        tsData.visits.add(event.sessionId);
 
-        const page = event.url || "/";
+        // Track unique visitors per time bucket instead of just sessions
+        if (event.visitorId) {
+            tsData.visits.add(event.visitorId);
+        } else {
+            tsData.visits.add(event.sessionId);
+        }
+
+        const page = event.pathname || "/"; // Updated to new column name
         pagesMap.set(page, (pagesMap.get(page) || 0) + 1);
 
-        const referrer = normalizeReferrer(event.referrer) || "Direct";
+        const referrer = event.referrer || "Direct";
         referrersMap.set(referrer, (referrersMap.get(referrer) || 0) + 1);
 
         const country = event.country || "Unknown";
@@ -256,14 +255,13 @@ export async function GET(req) {
         stats: {
             views,
             visits: uniqueSessions.size,
-            visitors: uniqueSessions.size,
+            visitors: uniqueVisitors.size > 0 ? uniqueVisitors.size : uniqueSessions.size, // Fallback to sessions if visitors is 0
             timeseries,
             topPages: sortMap(pagesMap),
             topReferrers: sortMap(referrersMap),
             topCountries: sortMap(countriesMap),
             topBrowsers: sortMap(browsersMap),
-            topDevices: sortMap(devicesMap)
-            ,
+            topDevices: sortMap(devicesMap),
             topOs: sortMap(osMap)
         }
     });
