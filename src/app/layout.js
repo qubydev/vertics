@@ -17,14 +17,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${poppins.className} h-full antialiased`}>
-      <head>
-        <Script
-          src="/vertics.js"
-          data-token="cc205f86-9e52-4ed6-8931-48dc8cd032d5"
-          data-server="http://localhost:3000"
-          strategy="beforeInteractive"
-        />
-      </head>
       <body className="min-h-full flex flex-col">
         {children}
 
