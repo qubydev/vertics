@@ -1,7 +1,7 @@
 (function () {
     const script = document.currentScript;
     const token = script.getAttribute("data-token");
-    const SERVER = (script.getAttribute("data-server") || "https://snaptics.vercel.app").replace(/\/$/, "");
+    const SERVER = (script.getAttribute("data-server") || "https://vertics.vercel.app").replace(/\/$/, "");
 
     if (!token) return;
 
@@ -100,7 +100,7 @@
         send("pagehide", { duration: Math.round((Date.now() - startTime) / 1000) });
     });
 
-    window.snaptics = {
+    window.vertics = {
         track: function (eventName, props) {
             send(eventName, { props: props || {} });
         },
