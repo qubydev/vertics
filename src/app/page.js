@@ -7,7 +7,9 @@ import Navbar from "@/components/navbar";
 export default function Page() {
   return (
     <div>
-      <Navbar />
+      <div className="fixed top-0 left-0 w-screen z-99 flex items-center justify-center sm:pt-4 sm:px-4">
+        <Navbar />
+      </div>
     </div>
   )
 }
