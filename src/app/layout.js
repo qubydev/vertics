@@ -1,22 +1,21 @@
-import { Poppins } from "next/font/google";
-import Script from "next/script";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata = {
   title: "Vertics",
-  description: "vercel analytics with extra features",
+  description: "Vercel analytics with extra features",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${poppins.className} h-full antialiased`}>
+    <html lang="en" className={`${jetBrainsMono.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         {children}
 
