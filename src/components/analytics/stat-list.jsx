@@ -20,11 +20,11 @@ export function StatList({ title, data, metricLabel = "Visitors", type = "defaul
     const getIcon = (name) => {
         if (type === "referrer") {
             if (name === "Direct" || !name) return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
-            return <img src={`https://www.google.com/s2/favicons?domain=${name}&sz=32`} alt={name} className="w-4 h-4 rounded-sm shrink-0 bg-white" />;
+            return <img src={`https://www.google.com/s2/favicons?domain=${name}&sz=32`} alt={name} className="w-4 h-4 shrink-0 bg-white" />;
         }
         if (type === "country") {
             if (name === "LOCAL" || name === "Unknown" || !name) return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
-            return <img src={`https://flagcdn.com/24x18/${name.toLowerCase()}.png`} alt={name} className="w-[18px] h-[13.5px] rounded-[2px] object-cover shrink-0 shadow-sm" />;
+            return <img src={`https://flagcdn.com/24x18/${name.toLowerCase()}.png`} alt={name} className="w-[18px] h-[13.5px] object-cover shrink-0 shadow-sm" />;
         }
         if (type === "device") {
             if (name?.toLowerCase() === "mobile") return <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />;
@@ -35,15 +35,15 @@ export function StatList({ title, data, metricLabel = "Visitors", type = "defaul
     };
 
     return (
-        <Card className="w-full flex flex-col h-[400px] rounded-xl shadow-none overflow-hidden">
-            <CardHeader className="pt-4 px-6 pb-0! space-y-0 border-b border-border shrink-0">
-                <div className="flex justify-between items-end w-full">
+        <Card className="w-full flex flex-col h-[400px]">
+            <CardHeader className="pt-4 px-6 pb-0 space-y-0 shrink-0">
+                <div className="flex justify-between items-end w-full border-b border-border">
                     <div className="flex items-center">
-                        <div className="pb-3 text-sm font-medium border-b-2 border-foreground text-foreground -mb-px">
+                        <div className="pb-3 text-sm font-bold uppercase tracking-tight border-b-2 border-foreground text-foreground -mb-[2px]">
                             {title}
                         </div>
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider pb-3">{metricLabel}</span>
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight pb-3">{metricLabel}</span>
                 </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col px-0 overflow-y-auto">
@@ -52,9 +52,9 @@ export function StatList({ title, data, metricLabel = "Visitors", type = "defaul
                         {data.map((item, i) => {
                             const pct = Math.min(100, Math.max(0, ((item.views || 0) / maxVal) * 100));
                             return (
-                                <div key={i} className="group relative flex items-center justify-between gap-4 rounded-md px-4 py-2 hover:bg-muted/50 transition-colors">
+                                <div key={i} className="group relative flex items-center justify-between gap-4 px-4 py-2 hover:bg-muted/50 transition-colors">
                                     <div
-                                        className="absolute left-1 top-1 bottom-1 bg-muted rounded-md transition-all -z-10"
+                                        className="absolute left-1 top-1 bottom-1 bg-muted transition-all -z-10"
                                         style={{ width: `calc(${pct}% - 8px)`, opacity: 0.7 }}
                                     />
                                     <div className="flex items-center gap-3 min-w-0 flex-1 z-10">
@@ -68,7 +68,7 @@ export function StatList({ title, data, metricLabel = "Visitors", type = "defaul
                     </div>
                 ) : (
                     <div className="flex items-center justify-center flex-1 py-12">
-                        <span className="text-sm text-muted-foreground">No data available</span>
+                        <span className="text-sm font-bold uppercase tracking-tight text-muted-foreground">No data available</span>
                     </div>
                 )}
             </CardContent>

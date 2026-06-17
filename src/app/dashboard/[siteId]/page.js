@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -46,25 +47,27 @@ export default function SiteStatsPage() {
     };
 
     return (
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-6 min-h-screen bg-background">
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8 min-h-screen bg-background">
             <DashboardHeader
                 site={site}
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
             />
-            <Card className="w-full rounded-xl shadow-none overflow-hidden">
+
+            <Card className="w-full flex flex-col">
                 <MetricCards
                     metricConfig={metricConfig}
                     activeMetric={activeMetric}
                     setActiveMetric={setActiveMetric}
                 />
-                <div className="w-full h-[320px] p-6">
+                <div className="w-full h-[360px] p-6">
                     <AnalyticsChart
                         data={stats.timeseries}
                         activeSeriesKey={metricConfig[activeMetric].dataKey}
                     />
                 </div>
             </Card>
+
             <div className="w-full flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                     <StatList title="Top Pages" data={stats.topPages} metricLabel="Views" type="page" />

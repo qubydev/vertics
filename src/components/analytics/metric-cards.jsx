@@ -2,12 +2,12 @@
 
 export function MetricCards({ metricConfig, activeMetric, setActiveMetric }) {
     return (
-        <div className="flex w-full border-b border-border bg-muted/20">
+        <div className="flex w-full border-b border-border bg-muted/10 overflow-x-auto">
             {Object.entries(metricConfig).map(([key, config]) => (
                 <button
                     key={key}
                     onClick={() => setActiveMetric(key)}
-                    className={`flex flex-col gap-1 px-8 py-4 text-left transition-all border-r border-border relative min-w-[180px] ${activeMetric === key
+                    className={`flex flex-col gap-2 px-8 py-6 text-left transition-all border-r border-border relative min-w-[200px] shrink-0 ${activeMetric === key
                             ? "bg-card"
                             : "hover:bg-muted/40"
                         }`}
@@ -15,10 +15,10 @@ export function MetricCards({ metricConfig, activeMetric, setActiveMetric }) {
                     {activeMetric === key && (
                         <div className="absolute top-0 left-0 right-0 h-[2px] bg-foreground" />
                     )}
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight">
                         {config.label}
                     </span>
-                    <span className="text-2xl font-bold text-foreground tracking-tight">
+                    <span className="text-3xl font-bold text-foreground tracking-tight">
                         {config.value.toLocaleString()}
                     </span>
                 </button>

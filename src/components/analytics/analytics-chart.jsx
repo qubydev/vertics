@@ -14,7 +14,7 @@ export function AnalyticsChart({ data, activeSeriesKey }) {
     if (!data || data.length === 0) {
         return (
             <div className="w-full h-full flex items-center justify-center">
-                <span className="text-muted-foreground text-sm">No data available for this period.</span>
+                <span className="text-muted-foreground text-sm font-bold uppercase tracking-tight">No data available for this period.</span>
             </div>
         );
     }
@@ -50,7 +50,7 @@ export function AnalyticsChart({ data, activeSeriesKey }) {
                     contentStyle={{
                         backgroundColor: 'var(--color-background)',
                         border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius)',
+                        borderRadius: '0',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
                         padding: '8px 12px'
                     }}

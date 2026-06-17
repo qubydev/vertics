@@ -24,13 +24,13 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
     };
 
     return (
-        <Card className="w-full flex flex-col h-[400px] rounded-xl shadow-none overflow-hidden">
-            <CardHeader className="pt-4 px-6 pb-0! space-y-0 border-b border-border shrink-0">
-                <div className="flex justify-between items-end w-full">
+        <Card className="w-full flex flex-col h-[400px]">
+            <CardHeader className="pt-4 px-6 pb-0 space-y-0 shrink-0">
+                <div className="flex justify-between items-end w-full border-b border-border">
                     <div className="flex items-center gap-6">
                         <button
                             onClick={() => setActive("left")}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 -mb-px ${active === "left"
+                            className={`pb-3 text-sm font-bold uppercase tracking-tight transition-colors border-b-2 -mb-[2px] ${active === "left"
                                     ? "border-foreground text-foreground"
                                     : "border-transparent text-muted-foreground hover:text-foreground/80"
                                 }`}
@@ -39,7 +39,7 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
                         </button>
                         <button
                             onClick={() => setActive("right")}
-                            className={`pb-3 text-sm font-medium transition-colors border-b-2 -mb-px ${active === "right"
+                            className={`pb-3 text-sm font-bold uppercase tracking-tight transition-colors border-b-2 -mb-[2px] ${active === "right"
                                     ? "border-foreground text-foreground"
                                     : "border-transparent text-muted-foreground hover:text-foreground/80"
                                 }`}
@@ -47,7 +47,7 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
                             {rightTitle}
                         </button>
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider pb-3">Visitors</span>
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight pb-3">Visitors</span>
                 </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col px-0 overflow-y-auto">
@@ -56,9 +56,9 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
                         {data.map((item, i) => {
                             const pct = Math.min(100, Math.max(0, ((item.views || 0) / maxVal) * 100));
                             return (
-                                <div key={i} className="group relative flex items-center justify-between gap-4 rounded-md px-4 py-2 hover:bg-muted/50 transition-colors">
+                                <div key={i} className="group relative flex items-center justify-between gap-4 px-4 py-2 hover:bg-muted/50 transition-colors">
                                     <div
-                                        className="absolute left-1 top-1 bottom-1 bg-muted rounded-md transition-all -z-10"
+                                        className="absolute left-1 top-1 bottom-1 bg-muted transition-all -z-10"
                                         style={{ width: `calc(${pct}% - 8px)`, opacity: 0.7 }}
                                     />
                                     <div className="flex items-center gap-3 min-w-0 flex-1 z-10">
@@ -72,7 +72,7 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
                     </div>
                 ) : (
                     <div className="flex items-center justify-center flex-1 py-12">
-                        <span className="text-sm text-muted-foreground">No data available</span>
+                        <span className="text-sm font-bold uppercase tracking-tight text-muted-foreground">No data available</span>
                     </div>
                 )}
             </CardContent>
