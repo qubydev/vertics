@@ -36,6 +36,20 @@
       "when": 1780032484082,
       "tag": "0004_flawless_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781678892499,
+      "tag": "0005_chief_hawkeye",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781679111715,
+      "tag": "0006_keen_night_nurse",
+      "breakpoints": true
     }
   ]
 }
