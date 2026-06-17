@@ -1,9 +1,7 @@
 "use client";
-
 import Navbar from "@/components/navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,37 +14,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Copy, Check, Edit, Trash2, Globe, Search } from "lucide-react";
+import { Plus, Copy, Check, Edit, Trash2, Globe, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
-
   const [sites, setSites] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState(null);
-
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
-
+  const [domainError, setDomainError] = useState("");
+  const [editingDomainError, setEditingDomainError] = useState("");
   const [editingSite, setEditingSite] = useState(null);
   const [deletingSite, setDeletingSite] = useState(null);
+  const [isSavingSite, setIsSavingSite] = useState(false);
+  const [isDeletingSite, setIsDeletingSite] = useState(false);
+  const [isUpdatingSite, setIsUpdatingSite] = useState(false);
 
   useEffect(() => {
-    if (!isPending && !session) {
-      router.replace("/login");
-    }
-  }, [isPending, router, session]);
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      fetchSites();
-    }
-  }, [session]);
+    fetchSites();
+  }, []);
 
   async function fetchSites() {
+    setIsLoading(true);
     try {
       const res = await fetch("/api/site");
       if (res.ok) {
@@ -55,11 +49,24 @@ export default function Dashboard() {
       }
     } catch (error) {
       toast.error("Failed to fetch sites");
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  async function handleAddSite(e) {
-    e.preventDefault();
+  async function handleAddSite() {
+    if (!name.trim() || !domain.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (!validateDomain(domain)) {
+      setDomainError("Invalid domain format (e.g., example.com)");
+      return;
+    }
+
+    setDomainError("");
+    setIsSavingSite(true);
     try {
       const res = await fetch("/api/site", {
         method: "POST",
@@ -68,7 +75,6 @@ export default function Dashboard() {
         },
         body: JSON.stringify({ name, domain }),
       });
-
       if (res.ok) {
         setName("");
         setDomain("");
@@ -80,13 +86,26 @@ export default function Dashboard() {
       }
     } catch (error) {
       toast.error("An error occurred while adding the site");
+    } finally {
+      setIsSavingSite(false);
     }
   }
 
-  async function handleUpdate(e) {
-    e.preventDefault();
+  async function handleUpdate() {
     if (!editingSite) return;
 
+    if (!editingSite.name.trim() || !editingSite.domain.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (!validateDomain(editingSite.domain)) {
+      setEditingDomainError("Invalid domain format (e.g., example.com)");
+      return;
+    }
+
+    setEditingDomainError("");
+    setIsUpdatingSite(true);
     try {
       const res = await fetch("/api/site", {
         method: "PUT",
@@ -96,10 +115,9 @@ export default function Dashboard() {
         body: JSON.stringify({
           id: editingSite.id,
           name: editingSite.name,
-          domain: editingSite.domain
-        })
+          domain: editingSite.domain,
+        }),
       });
-
       if (res.ok) {
         setEditingSite(null);
         fetchSites();
@@ -109,17 +127,19 @@ export default function Dashboard() {
       }
     } catch (error) {
       toast.error("An error occurred while updating the site");
+    } finally {
+      setIsUpdatingSite(false);
     }
   }
 
   async function handleDelete() {
     if (!deletingSite) return;
 
+    setIsDeletingSite(true);
     try {
       const res = await fetch(`/api/site?id=${deletingSite.id}`, {
         method: "DELETE",
       });
-
       if (res.ok) {
         setDeletingSite(null);
         fetchSites();
@@ -129,7 +149,19 @@ export default function Dashboard() {
       }
     } catch (error) {
       toast.error("An error occurred while deleting the site");
+    } finally {
+      setIsDeletingSite(false);
     }
+  }
+
+  function validateDomain(domain) {
+    if (!domain.trim()) return false;
+
+    let cleanDomain = domain.trim().replace(/^(https?:\/\/)?(www\.)?/, "");
+
+    const domainRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/i;
+
+    return domainRegex.test(cleanDomain);
   }
 
   function handleCopy(token, id) {
@@ -139,24 +171,19 @@ export default function Dashboard() {
     setTimeout(() => setCopiedId(null), 2000);
   }
 
-  const filteredSites = sites.filter(site =>
-    site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    site.domain.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredSites = sites.filter(
+    (site) =>
+      site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      site.domain.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  if (isPending || !session) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-
       <main className="flex-1 w-full max-w-4xl mx-auto p-4 sm:p-8 flex flex-col gap-10 mt-4 sm:mt-8">
         <div className="w-full">
           <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-xl font-semibold tracking-tight">Sites</h2>
-
             <div className="flex w-full sm:w-auto items-center gap-3">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -168,8 +195,12 @@ export default function Dashboard() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-
-              <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <Dialog open={isAddOpen} onOpenChange={(open) => {
+                setIsAddOpen(open);
+                if (!open) {
+                  setDomainError("");
+                }
+              }}>
                 <DialogTrigger asChild>
                   <Button className="shrink-0">
                     <Plus className="w-4 h-4 mr-2" />
@@ -183,7 +214,7 @@ export default function Dashboard() {
                       Enter the details for your new site below.
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleAddSite} className="flex flex-col gap-4 py-4">
+                  <div className="flex flex-col gap-4 py-4">
                     <div className="flex flex-col gap-2">
                       <Label htmlFor="name">Site Name</Label>
                       <Input
@@ -191,7 +222,6 @@ export default function Dashboard() {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        required
                         placeholder="e.g. My Awesome Blog"
                       />
                     </div>
@@ -201,34 +231,86 @@ export default function Dashboard() {
                         id="domain"
                         type="text"
                         value={domain}
-                        onChange={(e) => setDomain(e.target.value)}
-                        required
+                        onChange={(e) => {
+                          setDomain(e.target.value);
+                          setDomainError("");
+                        }}
                         placeholder="e.g. example.com"
+                        className={domainError ? "border-red-500" : ""}
                       />
+                      {domainError && (
+                        <p className="text-xs text-red-500">{domainError}</p>
+                      )}
                     </div>
                     <DialogFooter className="mt-4">
-                      <Button type="submit">Save Site</Button>
+                      <Button
+                        onClick={handleAddSite}
+                        disabled={isSavingSite}
+                      >
+                        {isSavingSite ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Site"
+                        )}
+                      </Button>
                     </DialogFooter>
-                  </form>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
           </div>
 
-          {filteredSites.length > 0 && (
+          {isLoading ? (
+            <div className="flex flex-col w-full bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-full py-6 border-b border-border last:border-b-0 flex justify-between items-center hover:bg-muted/50 px-6"
+                >
+                  <div className="flex items-center gap-4 flex-1">
+                    <Skeleton className="h-10 w-10 rounded-md shrink-0" />
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-5 w-48" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <Skeleton className="h-10 w-32 rounded" />
+                    <Skeleton className="h-10 w-10 rounded" />
+                    <Skeleton className="h-10 w-10 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredSites.length > 0 ? (
             <div className="flex flex-col w-full bg-background border border-border rounded-xl overflow-hidden shadow-sm">
               {filteredSites.map((s) => (
                 <div
                   key={s.id}
                   onClick={() => router.push(`/dashboard/${s.id}`)}
-                  className="w-full py-4 border-b border-border last:border-b-0 flex justify-between items-center hover:bg-muted/50 cursor-pointer transition-colors px-6"
+                  className="w-full py-6 border-b border-border last:border-b-0 flex justify-between items-center hover:bg-muted/50 cursor-pointer transition-colors px-6"
                 >
-                  <div className="flex flex-col gap-1.5">
-                    <p className="font-semibold text-lg flex items-center gap-2 text-foreground">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      {s.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground ml-6">{s.domain}</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted/30 shrink-0">
+                      <Globe className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-base font-semibold text-foreground">
+                        {s.name}
+                      </h3>
+                      <a
+                        href={`https://${s.domain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-sm text-muted-foreground hover:text-foreground hover:underline w-fit"
+                      >
+                        {s.domain}
+                      </a>
+                    </div>
                   </div>
                   <div className="flex gap-2 items-center">
                     <Button
@@ -277,16 +359,12 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-          )}
-
-          {sites.length > 0 && filteredSites.length === 0 && (
+          ) : sites.length > 0 && filteredSites.length === 0 ? (
             <div className="flex flex-col w-full items-center justify-center py-12 text-center text-muted-foreground border border-border rounded-xl border-dashed mt-6">
               <Search className="w-8 h-8 mb-4 opacity-50" />
               <p>No sites match your search.</p>
             </div>
-          )}
-
-          {sites.length === 0 && (
+          ) : (
             <div className="flex flex-col w-full items-center justify-center py-16 text-center text-muted-foreground border border-border rounded-xl border-dashed mt-6 bg-muted/20">
               <Globe className="w-10 h-10 mb-4 opacity-50 text-foreground" />
               <p className="mb-2 text-foreground font-medium">No sites added yet.</p>
@@ -299,7 +377,15 @@ export default function Dashboard() {
           )}
         </div>
 
-        <Dialog open={!!editingSite} onOpenChange={(open) => !open && setEditingSite(null)}>
+        <Dialog
+          open={!!editingSite}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingSite(null);
+              setEditingDomainError("");
+            }
+          }}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Site</DialogTitle>
@@ -308,15 +394,16 @@ export default function Dashboard() {
               </DialogDescription>
             </DialogHeader>
             {editingSite && (
-              <form onSubmit={handleUpdate} className="flex flex-col gap-4 py-4">
+              <div className="flex flex-col gap-4 py-4">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="edit-name">Site Name</Label>
                   <Input
                     id="edit-name"
                     type="text"
                     value={editingSite.name}
-                    onChange={(e) => setEditingSite({ ...editingSite, name: e.target.value })}
-                    required
+                    onChange={(e) =>
+                      setEditingSite({ ...editingSite, name: e.target.value })
+                    }
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -325,30 +412,78 @@ export default function Dashboard() {
                     id="edit-domain"
                     type="text"
                     value={editingSite.domain}
-                    onChange={(e) => setEditingSite({ ...editingSite, domain: e.target.value })}
-                    required
+                    onChange={(e) => {
+                      setEditingSite({ ...editingSite, domain: e.target.value });
+                      setEditingDomainError("");
+                    }}
+                    className={editingDomainError ? "border-red-500" : ""}
                   />
+                  {editingDomainError && (
+                    <p className="text-xs text-red-500">{editingDomainError}</p>
+                  )}
                 </div>
                 <DialogFooter className="mt-4">
-                  <Button variant="outline" type="button" onClick={() => setEditingSite(null)}>Cancel</Button>
-                  <Button type="submit">Save Changes</Button>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => setEditingSite(null)}
+                    disabled={isUpdatingSite}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleUpdate}
+                    disabled={isUpdatingSite}
+                  >
+                    {isUpdatingSite ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
                 </DialogFooter>
-              </form>
+              </div>
             )}
           </DialogContent>
         </Dialog>
 
-        <Dialog open={!!deletingSite} onOpenChange={(open) => !open && setDeletingSite(null)}>
+        <Dialog
+          open={!!deletingSite}
+          onOpenChange={(open) => !open && setDeletingSite(null)}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Delete Site</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete <strong>{deletingSite?.name}</strong>? This action cannot be undone.
+                Are you sure you want to delete <strong>{deletingSite?.name}</strong>?
+                This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setDeletingSite(null)}>Cancel</Button>
-              <Button variant="destructive" onClick={handleDelete}>Confirm Delete</Button>
+              <Button
+                variant="outline"
+                onClick={() => setDeletingSite(null)}
+                disabled={isDeletingSite}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeletingSite}
+              >
+                {isDeletingSite ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Confirm Delete"
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

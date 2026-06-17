@@ -25,12 +25,26 @@ export function DashboardHeader({ site, timeRange, setTimeRange }) {
                 >
                     <ArrowLeft className="w-4 h-4" />
                 </Button>
-                <div className="h-4 w-px bg-border" />
-                <div className="flex items-center gap-2.5">
-                    <Globe className="w-4 h-4 text-muted-foreground" />
-                    <h1 className="text-base font-semibold text-foreground">
-                        {site?.name || site?.domain || "Loading..."}
-                    </h1>
+                <div className="h-6 w-px bg-border" />
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/30">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-sm font-semibold leading-none text-foreground">
+                            {site?.name || site?.domain || "Loading..."}
+                        </h1>
+                        {site?.domain && (
+                            <a
+                                href={`https://${site.domain}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs leading-none text-muted-foreground hover:text-foreground hover:underline w-fit"
+                            >
+                                {site.domain}
+                            </a>
+                        )}
+                    </div>
                 </div>
             </div>
 

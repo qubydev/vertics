@@ -1,8 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { StatList } from "@/components/analytics/stat-list";
 import { TabStatCard } from "@/components/analytics/tab-stat-card";
@@ -11,11 +9,8 @@ import { AnalyticsChart } from "@/components/analytics/analytics-chart";
 import { DashboardHeader } from "@/components/analytics/dashboard-header";
 
 export default function SiteStatsPage() {
-    const router = useRouter();
     const params = useParams();
     const siteId = params.siteId;
-    const { data: session, isPending } = authClient.useSession();
-
     const [site, setSite] = useState(null);
     const [timeRange, setTimeRange] = useState("7d");
     const [activeMetric, setActiveMetric] = useState("visitors");
@@ -33,13 +28,7 @@ export default function SiteStatsPage() {
     });
 
     useEffect(() => {
-        if (!isPending && !session) {
-            router.replace("/login");
-        }
-    }, [isPending, router, session]);
-
-    useEffect(() => {
-        if (session?.user?.id && siteId) {
+        if (siteId) {
             fetch(`/api/stats?siteId=${siteId}&timeRange=${timeRange}`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -49,11 +38,7 @@ export default function SiteStatsPage() {
                     }
                 });
         }
-    }, [session, siteId, timeRange]);
-
-    if (isPending || !session || !site) {
-        return null;
-    }
+    }, [siteId, timeRange]);
 
     const metricConfig = {
         visitors: { label: "Unique Visitors", value: stats.visitors, dataKey: "visits" },
@@ -67,14 +52,12 @@ export default function SiteStatsPage() {
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
             />
-
             <Card className="w-full rounded-xl shadow-none overflow-hidden">
                 <MetricCards
                     metricConfig={metricConfig}
                     activeMetric={activeMetric}
                     setActiveMetric={setActiveMetric}
                 />
-
                 <div className="w-full h-[320px] p-6">
                     <AnalyticsChart
                         data={stats.timeseries}
@@ -82,13 +65,11 @@ export default function SiteStatsPage() {
                     />
                 </div>
             </Card>
-
             <div className="w-full flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                     <StatList title="Top Pages" data={stats.topPages} metricLabel="Views" type="page" />
                     <StatList title="Referrers" data={stats.topReferrers} metricLabel="Referrals" type="referrer" />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                     <StatList title="Countries" data={stats.topCountries} metricLabel="Visitors" type="country" />
                     <TabStatCard
