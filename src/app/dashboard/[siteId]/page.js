@@ -47,7 +47,7 @@ export default function SiteStatsPage() {
     };
 
     return (
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8 min-h-screen bg-background">
+        <main className="w-full max-w-5xl mx-auto px-4 py-6 flex flex-col gap-8 min-h-screen bg-background">
             <DashboardHeader
                 site={site}
                 timeRange={timeRange}

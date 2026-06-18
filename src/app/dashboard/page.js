@@ -186,7 +186,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center justify-center sm:mt-4 sm:px-4">
+      <div className="flex items-center justify-center sm:mt-6 sm:px-4">
         <Navbar />
       </div>
 
@@ -273,7 +273,7 @@ export default function Dashboard() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="border-2 rounded-none flex flex-col">
+              <Card key={i}>
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
                   <Skeleton className="h-10 w-10 shrink-0" />
                   <div className="flex flex-col gap-2 w-full">
@@ -297,7 +297,7 @@ export default function Dashboard() {
               <Card
                 key={s.id}
                 onClick={() => router.push(`/dashboard/${s.id}`)}
-                className="border-2 rounded-none cursor-pointer hover:bg-muted/20 transition-colors group flex flex-col"
+                className="cursor-pointer hover:bg-muted transition-colors"
               >
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
                   <SiteLogo size={40} domain={s.domain} />
@@ -318,8 +318,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardFooter className="flex items-center justify-between p-6 pt-3 mt-auto">
                   <Button
-                    variant="secondary"
-                    size="sm"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCopy(s.token, s.id);
@@ -339,24 +338,22 @@ export default function Dashboard() {
                   </Button>
                   <div className="flex items-center gap-1">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingSite(s);
                       }}
-                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="destructive"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingSite(s);
                       }}
-                      className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
