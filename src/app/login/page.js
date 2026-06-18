@@ -13,7 +13,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen max-w-5xl mx-auto w-full">
-      <div className="flex items-center justify-center sm:mt-6 sm:px-4">
+      <div className="flex items-center justify-center sm:mt-6">
         <Navbar />
       </div>
 

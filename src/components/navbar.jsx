@@ -15,6 +15,8 @@ import {
 import { LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
+import ConnectButton from "./connect-button";
+import { Skeleton } from "./ui/skeleton";
 
 export default function Navbar() {
     const { data: session } = authClient.useSession();
@@ -22,13 +24,17 @@ export default function Navbar() {
     const pathname = usePathname();
 
     return (
-        <nav className="py-4 px-4 sm:px-6 h-18 flex items-center max-w-5xl w-full border-2 bg-card">
+        <nav className="py-4 px-4 sm:px-6 h-18 flex items-center max-w-5xl w-full border-2 bg-card gap-3 mx-auto">
             <Link href="/" className="flex items-center gap-2">
                 <img src="/logo.png" alt="Vertics Logo" className="size-8" />
                 <span className="font-bold text-2xl tracking-tight text-foreground uppercase hidden sm:block">Vertics</span>
             </Link>
 
             <div className="flex-1"></div>
+
+            {pathname.startsWith("/dashboard") && (
+                <ConnectButton />
+            )}
 
             {!pathname.startsWith("/dashboard") ? (
                 <Button
@@ -46,11 +52,20 @@ export default function Navbar() {
                             <AvatarImage src={session?.user?.image} />
                         </Avatar>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 z-100">
+                    <DropdownMenuContent align="end" className="w-56 z-100 mt-2.5">
                         <DropdownMenuLabel>
                             <div className="flex flex-col space-y-1">
-                                <p className="text-foreground font-medium leading-none">{session?.user?.name}</p>
-                                <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+                                {session?.user ? (
+                                    <>
+                                        <p className="text-foreground font-medium leading-none">{session?.user?.name}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Skeleton className="h-5 w-40" />
+                                        <Skeleton className="h-4 w-50" />
+                                    </>
+                                )}
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />

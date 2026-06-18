@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import SiteLogo from "@/components/site-logo";
 import { Skeleton } from "../ui/skeleton";
+import ConnectButton from "@/components/connect-button";
 
 export function DashboardHeader({ site, timeRange, setTimeRange }) {
     const router = useRouter();
@@ -51,7 +52,8 @@ export function DashboardHeader({ site, timeRange, setTimeRange }) {
                 </div>
             </div>
 
-            <div className="w-full sm:w-auto">
+            <div className="w-full sm:w-auto flex items-center gap-2">
+                <ConnectButton />
                 <Select value={timeRange} onValueChange={setTimeRange}>
                     <SelectTrigger className="w-full sm:w-40 bg-card">
                         <SelectValue placeholder="Select timeframe" />
