@@ -22,7 +22,7 @@ export default function Navbar() {
     const pathname = usePathname();
 
     return (
-        <nav className="py-4 px-4 sm:px-6 h-18 flex items-center max-w-5xl w-full clip-corners bg-card">
+        <nav className="py-4 px-4 sm:px-6 h-18 flex items-center max-w-5xl w-full border-2 bg-card">
             <Link href="/" className="flex items-center gap-2">
                 <img src="/logo.png" alt="Vertics Logo" className="size-8 hidden sm:block" />
                 <span className="font-bold text-2xl tracking-tight text-foreground uppercase">Vertics</span>

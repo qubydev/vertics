@@ -272,7 +272,7 @@ export default function Dashboard() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="clip-corners rounded-none flex flex-col">
+              <Card key={i} className="border-2 rounded-none flex flex-col">
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
                   <Skeleton className="h-10 w-10 shrink-0" />
                   <div className="flex flex-col gap-2 w-full">
@@ -296,7 +296,7 @@ export default function Dashboard() {
               <Card
                 key={s.id}
                 onClick={() => router.push(`/dashboard/${s.id}`)}
-                className="clip-corners rounded-none cursor-pointer hover:bg-muted/50 transition-colors group flex flex-col"
+                className="border-2 rounded-none cursor-pointer hover:bg-muted/20 transition-colors group flex flex-col"
               >
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
                   <div className="flex h-10 w-10 items-center justify-center border border-border bg-muted/30 shrink-0">
