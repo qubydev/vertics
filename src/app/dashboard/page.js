@@ -24,6 +24,7 @@ import {
 import { Plus, Copy, Check, Edit, Trash2, Globe, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import SiteLogo from "@/components/site-logo";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -89,12 +90,12 @@ export default function Dashboard() {
         setDomain("");
         setIsAddOpen(false);
         fetchSites();
-        toast.success("Site added successfully");
+        toast.success("Website added successfully");
       } else {
-        toast.error("Failed to add site");
+        toast.error("Failed to add website");
       }
     } catch (error) {
-      toast.error("An error occurred while adding the site");
+      toast.error("An error occurred while adding the website");
     } finally {
       setIsSavingSite(false);
     }
@@ -130,12 +131,12 @@ export default function Dashboard() {
       if (res.ok) {
         setEditingSite(null);
         fetchSites();
-        toast.success("Site updated successfully");
+        toast.success("Website updated successfully");
       } else {
-        toast.error("Failed to update site");
+        toast.error("Failed to update website");
       }
     } catch (error) {
-      toast.error("An error occurred while updating the site");
+      toast.error("An error occurred while updating the website");
     } finally {
       setIsUpdatingSite(false);
     }
@@ -152,12 +153,12 @@ export default function Dashboard() {
       if (res.ok) {
         setDeletingSite(null);
         fetchSites();
-        toast.success("Site deleted successfully");
+        toast.success("Website deleted successfully");
       } else {
-        toast.error("Failed to delete site");
+        toast.error("Failed to delete website");
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the site");
+      toast.error("An error occurred while deleting the website");
     } finally {
       setIsDeletingSite(false);
     }
@@ -185,13 +186,13 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center justify-center mt-4 px-4">
+      <div className="flex items-center justify-center sm:mt-4 sm:px-4">
         <Navbar />
       </div>
 
       <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-8 mt-4 sm:mt-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-xl font-bold uppercase tracking-tight text-foreground">Your Websites</h1>
+          <h1 className="text-xl font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <div className="relative w-full sm:w-64">
@@ -213,19 +214,19 @@ export default function Dashboard() {
               <DialogTrigger asChild>
                 <Button className="shrink-0">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Site
+                  Add New
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="uppercase tracking-tight">Add New Site</DialogTitle>
+                  <DialogTitle className="uppercase tracking-tight">Add New Website</DialogTitle>
                   <DialogDescription>
-                    Enter the details for your new site below.
+                    Enter the details for your new website below.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4 py-4">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="name">Site Name</Label>
+                    <Label htmlFor="name">Website Name</Label>
                     <Input
                       id="name"
                       type="text"
@@ -260,7 +261,7 @@ export default function Dashboard() {
                         Saving...
                       </>
                     ) : (
-                      "Save Site"
+                      "Save Website"
                     )}
                   </Button>
                 </DialogFooter>
@@ -299,9 +300,7 @@ export default function Dashboard() {
                 className="border-2 rounded-none cursor-pointer hover:bg-muted/20 transition-colors group flex flex-col"
               >
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
-                  <div className="flex h-10 w-10 items-center justify-center border border-border bg-muted/30 shrink-0">
-                    <Globe className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </div>
+                  <SiteLogo size={40} domain={s.domain} />
                   <div className="flex flex-col gap-1 overflow-hidden">
                     <CardTitle className="text-base font-bold leading-none uppercase tracking-tight truncate">
                       {s.name}
@@ -377,7 +376,7 @@ export default function Dashboard() {
             <p className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-tight">No sites active</p>
             <Button onClick={() => setIsAddOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Add Site
+              Add New
             </Button>
           </div>
         )}
@@ -393,15 +392,15 @@ export default function Dashboard() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="uppercase tracking-tight">Edit Site</DialogTitle>
+              <DialogTitle className="uppercase tracking-tight">Edit Website</DialogTitle>
               <DialogDescription>
-                Update the name or domain for your site.
+                Update the name or domain for your website.
               </DialogDescription>
             </DialogHeader>
             {editingSite && (
               <div className="flex flex-col gap-4 py-4">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="edit-name">Site Name</Label>
+                  <Label htmlFor="edit-name">Website Name</Label>
                   <Input
                     id="edit-name"
                     type="text"
@@ -483,7 +482,7 @@ export default function Dashboard() {
                     Deleting...
                   </>
                 ) : (
-                  "Delete Site"
+                  "Delete Website"
                 )}
               </Button>
             </DialogFooter>

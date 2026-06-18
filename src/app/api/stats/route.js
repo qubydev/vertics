@@ -28,7 +28,7 @@ export async function GET(req) {
         .limit(1);
 
     if (!siteRecord.length) {
-        return NextResponse.json({ error: "Site not found" }, { status: 404 });
+        return NextResponse.json({ error: "Website not found" }, { status: 404 });
     }
 
     const targetSite = siteRecord[0];

@@ -24,8 +24,8 @@ export default function Navbar() {
     return (
         <nav className="py-4 px-4 sm:px-6 h-18 flex items-center max-w-5xl w-full border-2 bg-card">
             <Link href="/" className="flex items-center gap-2">
-                <img src="/logo.png" alt="Vertics Logo" className="size-8 hidden sm:block" />
-                <span className="font-bold text-2xl tracking-tight text-foreground uppercase">Vertics</span>
+                <img src="/logo.png" alt="Vertics Logo" className="size-8" />
+                <span className="font-bold text-2xl tracking-tight text-foreground uppercase hidden sm:block">Vertics</span>
             </Link>
 
             <div className="flex-1"></div>
@@ -39,7 +39,7 @@ export default function Navbar() {
             ) : (
                 <DropdownMenu>
                     <DropdownMenuTrigger className="outline-none cursor-pointer">
-                        <Avatar className="border size-9">
+                        <Avatar className="size-9">
                             <AvatarFallback className="font-bold text-lg">
                                 {session?.user?.name?.charAt(0).toUpperCase() || "?"}
                             </AvatarFallback>
