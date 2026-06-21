@@ -11,7 +11,7 @@ export default function Hero() {
                         <h1>with single <span className="text-blue-500">{"<script>"}</span></h1>
                     </div>
 
-                    <p className="font-bold text-muted-foreground max-w-128 mt-2 text-sm md:text-base">Add one script and start tracking traffic, <span className="hidden sm:inline-block">user behavior, events</span> and performance in seconds.</p>
+                    <p className="font-bold text-muted-foreground mt-2 text-sm md:text-base max-w-80 md:max-w-120">Add one script and start tracking traffic and performance in seconds.</p>
                     <Button
                         className="mt-4"
                     >Get started</Button>
