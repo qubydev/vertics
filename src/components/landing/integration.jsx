@@ -12,7 +12,7 @@ export default function Integration() {
             <div className="flex flex-col gap-16 md:gap-24">
                 <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
                     <div className="w-full md:w-1/2 flex justify-center">
-                        <img src="/add-website.png" alt="Add your website" className="w-full max-w-82 aspect-square object-contain bg-muted border" />
+                        <img src="/add-website.png" alt="Add your website" className="w-full sm:max-w-82 aspect-square object-contain bg-muted border" />
                     </div>
                     <div className="w-full md:w-1/2 flex flex-col gap-4 md:pt-4">
                         <h2 className="text-2xl font-bold flex items-center gap-4">
@@ -27,7 +27,7 @@ export default function Integration() {
 
                 <div className="flex flex-col md:flex-row-reverse items-start gap-8 md:gap-12">
                     <div className="w-full md:w-1/2 flex justify-center">
-                        <img src="/copy-token.png" alt="Copy Your Token" className="w-full max-w-82 aspect-square object-contain bg-muted border" />
+                        <img src="/copy-token.png" alt="Copy Your Token" className="w-full sm:max-w-82 aspect-square object-contain bg-muted border" />
                     </div>
                     <div className="w-full md:w-1/2 flex flex-col gap-4 md:pt-4">
                         <h2 className="text-2xl font-bold flex items-center gap-4">
@@ -42,7 +42,7 @@ export default function Integration() {
 
                 <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
                     <div className="w-full md:w-1/2 flex justify-center">
-                        <img src="/add-script.png" alt="Install the Script" className="w-full max-w-82 aspect-square object-contain bg-muted border" />
+                        <img src="/add-script.png" alt="Install the Script" className="w-full sm:max-w-82 aspect-square object-contain bg-muted border" />
                     </div>
                     <div className="w-full md:w-1/2 flex flex-col gap-4 md:pt-4">
                         <h2 className="text-2xl font-bold flex items-center gap-4">
