@@ -2,6 +2,7 @@ import Navbar from "@/components/navbar"
 import Hero from "@/components/landing/hero"
 import Proof from "@/components/landing/proof"
 import Integration from "@/components/landing/integration"
+import Features from "@/components/landing/features"
 
 export default function Page() {
   return (
@@ -15,7 +16,7 @@ export default function Page() {
       <Hero />
       <Proof />
       <Integration />
-
+      <Features />
     </div>
   )
 }
