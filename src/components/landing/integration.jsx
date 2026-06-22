@@ -16,12 +16,12 @@ export default function Integration() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto px-4 py-16">
-            <h1 className="text-center text-muted-foreground font-bold text-2xl md:text-3xl tracking-tight underline decoration-dashed decoration-2 underline-offset-8 mb-20">
-                Easy <span className="text-primary">Integration</span>
+        <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+            <h1 className="text-center font-bold text-2xl md:text-3xl tracking-tighter mb-20">
+                Easy <span className="text-muted-foreground">Integration</span>
             </h1>
 
-            <div className="flex flex-col gap-10 max-w-4xl mx-auto">
+            <div className="flex flex-col gap-10 mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
                     <div className="w-full border bg-muted">
                         <Image
@@ -32,12 +32,16 @@ export default function Integration() {
                             className="w-full h-auto aspect-[4/3] object-contain"
                         />
                     </div>
+
                     <div className="flex flex-col gap-3">
-                        <h2 className="text-xl font-semibold flex items-center gap-3">
-                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-base">1</span>
+                        <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-3">
+                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-sm">
+                                1
+                            </span>
                             Add your website
                         </h2>
-                        <div className="leading-relaxed text-muted-foreground">
+
+                        <div className="text-sm md:text-base text-muted-foreground">
                             <p>Add your website domain to vertices in your dashboard.</p>
 
                             <p className="mt-2">
@@ -63,15 +67,20 @@ export default function Integration() {
                             className="w-full h-auto aspect-[4/3] object-contain"
                         />
                     </div>
+
                     <div className="flex flex-col gap-3">
-                        <h2 className="text-xl font-semibold flex items-center gap-3">
-                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-base">2</span>
+                        <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-3">
+                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-sm">
+                                2
+                            </span>
                             Copy Your Token
                         </h2>
-                        <div className="text-muted-foreground leading-relaxed">
+
+                        <div className="text-sm md:text-base text-muted-foreground">
                             <p>Grab the unique tracking token for your web site from the dashboard.</p>
-                            <p className='mt-2'>
-                                <span className='font-bold'>Note:</span> This token is anonymous and safe to expose in frontend code.
+
+                            <p className="mt-2">
+                                <span className="font-semibold text-foreground">Note:</span> This token is anonymous and safe to expose in frontend code.
                             </p>
                         </div>
                     </div>
@@ -87,18 +96,25 @@ export default function Integration() {
                             className="w-full h-auto aspect-[4/3] object-contain"
                         />
                     </div>
+
                     <div className="flex flex-col gap-3">
-                        <h2 className="text-xl font-semibold flex items-center gap-3">
-                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-base">3</span>
+                        <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-3">
+                            <span className="flex items-center justify-center w-7 h-7 bg-primary text-primary-foreground text-sm">
+                                3
+                            </span>
                             Install the Script
                         </h2>
-                        <p className="text-muted-foreground leading-relaxed">
-                            Paste this snippet into your website's &lt;head&gt; section, replacing <span className='font-bold'>YOUR_SITE_TOKEN</span> with your copied token.
+
+                        <p className="text-sm md:text-base text-muted-foreground">
+                            Paste this snippet into your website&apos;s &lt;head&gt; section, replacing <span className="font-semibold text-foreground">YOUR_SITE_TOKEN</span> with your copied token.
                         </p>
 
                         <div className="mt-2 relative border border-border flex flex-col">
                             <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
-                                <span className="text-xs font-bold uppercase tracking-tight text-muted-foreground">HTML</span>
+                                <span className="text-xs font-semibold uppercase text-muted-foreground">
+                                    HTML
+                                </span>
+
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -108,8 +124,9 @@ export default function Integration() {
                                     {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
                                 </Button>
                             </div>
+
                             <div className="p-4 overflow-x-auto bg-zinc-950">
-                                <pre className="text-xs font-mono leading-relaxed whitespace-pre-wrap break-all">
+                                <pre className="text-xs font-mono whitespace-pre-wrap break-all">
                                     <span className="text-zinc-500">{"<"}</span>
                                     <span className="text-pink-400">script</span>
                                     <span className="text-sky-300"> defer</span>
