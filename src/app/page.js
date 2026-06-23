@@ -4,7 +4,7 @@ import Proof from "@/components/landing/proof"
 import Integration from "@/components/landing/integration"
 import Features from "@/components/landing/features"
 import FAQ from "@/components/landing/faq"
-import CTA from "@/components/landing/ta"
+import CTA from "@/components/landing/cta"
 import Footer from "@/components/landing/footer"
 
 export default function Page() {
