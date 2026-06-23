@@ -136,7 +136,7 @@
 
 .world-map path {
   fill: transparent;
-  stroke: var(--foreground);
+  stroke: color-mix(in oklab, var(--foreground) 50%, transparent);
   transition: fill 0.2s ease-in-out;
   cursor: crosshair;
 }
