@@ -133,3 +133,15 @@
     @apply cursor-pointer;
   }
 }
+
+.world-map path {
+  fill: transparent;
+  stroke: var(--foreground);
+  transition: fill 0.2s ease-in-out;
+  cursor: crosshair;
+}
+
+.world-map path:hover {
+  fill: var(--primary) !important;
+  fill-opacity: 1 !important;
+}
