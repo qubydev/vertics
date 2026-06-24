@@ -12,12 +12,14 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   return (
-    <div className="min-h-screen max-w-5xl mx-auto w-full">
-      <div className="flex items-center justify-center sm:mt-6">
-        <Navbar />
+    <div className="min-h-screen pt-24">
+      <div className="fixed top-0 left-0 w-screen flex items-center justify-center z-50 mx-auto">
+        <div className="max-w-264 w-full sm:px-4 sm:pt-4">
+          <Navbar />
+        </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 pt-[20vh]">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 pt-[14vh]">
         <Card className="w-full max-w-[400px] flex flex-col">
           <CardHeader className="text-center pb-6 border-b border-border">
             <CardTitle className="text-2xl font-bold uppercase tracking-tight">Welcome Back</CardTitle>

@@ -75,7 +75,7 @@ export default function Navbar() {
                             onClick={() => authClient.signOut({
                                 fetchOptions: {
                                     onSuccess: () => {
-                                        router.push("/login");
+                                        router.push("/");
                                     },
                                 },
                             })}

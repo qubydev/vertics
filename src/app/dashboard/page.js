@@ -185,12 +185,14 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center justify-center sm:mt-6 sm:px-4">
-        <Navbar />
+    <div className="min-h-screen bg-background flex flex-col pt-24">
+      <div className="fixed top-0 left-0 w-screen flex items-center justify-center z-50 mx-auto">
+        <div className="max-w-264 w-full sm:px-4 sm:pt-4">
+          <Navbar />
+        </div>
       </div>
 
-      <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-8 mt-4 sm:mt-8">
+      <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-lg font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
 
