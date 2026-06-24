@@ -265,7 +265,7 @@ const WorldMapCard = () => {
 
     const heatMapStyles = Object.entries(heatMapData).map(([code, value]) => {
         const opacity = Math.max(0.15, value / maxHeat).toFixed(2);
-        return `#${code} { fill: var(--primary) !important; fill-opacity: ${opacity} !important; }`;
+        return `#${code} { fill: oklch(0.68 0.15 205) !important; fill-opacity: ${opacity} !important; }`;
     }).join("\n");
 
     useEffect(() => {
