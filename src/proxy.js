@@ -6,12 +6,13 @@ export async function proxy(request) {
     const pathname = request.nextUrl.pathname;
 
     const protectedRoutes = ["/dashboard"];
+    const isProtectedRoute = protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
     if (sessionCookie && pathname === "/") {
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    if (!sessionCookie && protectedRoutes.includes(pathname)) {
+    if (!sessionCookie && isProtectedRoute) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -19,5 +20,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ["/", "/dashboard"],
+    matcher: ["/", "/dashboard/:path*"],
 };

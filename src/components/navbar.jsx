@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,8 +21,27 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function Navbar() {
     const { data: session } = authClient.useSession();
+    const [isSigningOut, setIsSigningOut] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+
+    const handleSignOut = async () => {
+        if (isSigningOut) return;
+
+        setIsSigningOut(true);
+
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    router.replace("/login");
+                    router.refresh();
+                },
+                onError: () => {
+                    setIsSigningOut(false);
+                },
+            },
+        });
+    };
 
     return (
         <nav className="py-4 px-4 sm:px-6 h-18 flex items-center w-full border-2 bg-card gap-3 mx-auto">
@@ -72,16 +92,11 @@ export default function Navbar() {
                         <Button
                             className="w-full"
                             variant="destructive"
-                            onClick={() => authClient.signOut({
-                                fetchOptions: {
-                                    onSuccess: () => {
-                                        router.push("/");
-                                    },
-                                },
-                            })}
+                            disabled={isSigningOut}
+                            onClick={handleSignOut}
                         >
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
+                            <span>{isSigningOut ? "Logging out..." : "Log out"}</span>
                         </Button>
                     </DropdownMenuContent>
                 </DropdownMenu>
