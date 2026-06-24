@@ -4,6 +4,7 @@ import { site, analyticsEvent } from "@/db/schema";
 import { eq, and, gte } from "drizzle-orm";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
+import { isAdminSession } from "@/lib/admin";
 
 export async function GET(req) {
     const session = await auth.api.getSession({
@@ -22,9 +23,14 @@ export async function GET(req) {
         return NextResponse.json({ error: "Missing site ID" }, { status: 400 });
     }
 
+    const isAdmin = isAdminSession(session);
+    const siteWhere = isAdmin
+        ? eq(site.id, siteId)
+        : and(eq(site.id, siteId), eq(site.userId, userId));
+
     const siteRecord = await db.select()
         .from(site)
-        .where(and(eq(site.id, siteId), eq(site.userId, userId)))
+        .where(siteWhere)
         .limit(1);
 
     if (!siteRecord.length) {
