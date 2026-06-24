@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Copy, Check, Edit, Trash2, Globe, Search, Loader2, ShieldCheck } from "lucide-react";
+import { Plus, Copy, Check, Edit, Trash2, Globe, Search, Loader2, ShieldCheck, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import SiteLogo from "@/components/site-logo";
@@ -266,12 +266,10 @@ export default function Dashboard() {
               </div>
             </>
           ) : (
-            <>
-              <span className="text-xs font-bold uppercase tracking-tight text-muted-foreground">
-                Admin view
-              </span>
-              <Button variant="outline">View Analytics</Button>
-            </>
+            <Button className="ml-auto" variant="outline">
+              View Analytics
+              <ArrowRight className="size-4" />
+            </Button>
           )}
         </CardFooter>
       </Card>
@@ -309,17 +307,12 @@ export default function Dashboard() {
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-lg font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
               {isAdmin && (
-                <span className="inline-flex items-center gap-1.5 border bg-muted px-2 py-1 text-xs font-bold uppercase tracking-tight text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 border border-lime-500/40 bg-lime-400/15 px-2 py-1 text-xs font-bold uppercase tracking-tight text-lime-700 dark:text-lime-300">
                   <ShieldCheck className="size-3.5" />
                   Admin
                 </span>
               )}
             </div>
-            {isAdmin && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Admin access enabled. Other user sites are shown separately.
-              </p>
-            )}
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
