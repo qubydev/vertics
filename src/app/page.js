@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default function Page() {
   return (
-    <div className="pt-24 flex flex-col">
+    <div className="pt-18 sm:pt-24 flex flex-col">
       <div className="fixed top-0 left-0 w-screen flex items-center justify-center z-50 mx-auto">
         <div className="max-w-264 w-full sm:px-4 sm:pt-4">
           <Navbar />

@@ -294,7 +294,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pt-24">
+    <div className="min-h-screen bg-background flex flex-col pt-18 sm:pt-24">
       <div className="fixed top-0 left-0 w-screen flex items-center justify-center z-50 mx-auto">
         <div className="max-w-264 w-full sm:px-4 sm:pt-4">
           <Navbar />
@@ -307,7 +307,7 @@ export default function Dashboard() {
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-lg font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
               {isAdmin && (
-                <span className="inline-flex items-center gap-1.5 border border-lime-500/40 bg-lime-400/15 px-2 py-1 text-xs font-bold uppercase tracking-tight text-lime-700 dark:text-lime-300">
+                <span className="inline-flex items-center gap-1.5 border border-emerald-600/25 bg-emerald-50 px-2 py-1 text-xs font-bold uppercase tracking-tight text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300">
                   <ShieldCheck className="size-3.5" />
                   Admin
                 </span>

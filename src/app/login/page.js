@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24">
+    <div className="min-h-screen pt-18 sm:pt-24">
       <div className="fixed top-0 left-0 w-screen flex items-center justify-center z-50 mx-auto">
         <div className="max-w-264 w-full sm:px-4 sm:pt-4">
           <Navbar />
