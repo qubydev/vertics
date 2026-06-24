@@ -39,11 +39,11 @@ export default function CTA() {
             <div
                 ref={containerRef}
                 onMouseMove={handleMouseMove}
-                className="relative border border-background/20 bg-foreground text-background p-10 md:p-16 text-center flex flex-col items-center overflow-hidden"
+                className="relative border border-border bg-card text-card-foreground p-10 md:p-16 text-center flex flex-col items-center overflow-hidden"
             >
                 <div
                     ref={lettersRef}
-                    className="absolute inset-0 z-0 overflow-hidden break-all font-mono text-[0.8rem] font-medium leading-none text-background/60 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none select-none"
+                    className="absolute inset-0 z-0 overflow-hidden break-all font-mono text-[0.8rem] font-medium leading-none text-foreground/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none select-none"
                     style={{
                         WebkitMaskImage: `radial-gradient(350px circle at var(--x, 0px) var(--y, 0px), white 20%, rgb(255 255 255 / 25%), transparent)`,
                         maskImage: `radial-gradient(350px circle at var(--x, 0px) var(--y, 0px), white 20%, rgb(255 255 255 / 25%), transparent)`
@@ -55,12 +55,12 @@ export default function CTA() {
                         Start Tracking Today
                     </h1>
 
-                    <p className="mt-4 text-sm md:text-base text-background/80 max-w-lg">
+                    <p className="mt-4 text-sm md:text-base text-muted-foreground max-w-lg">
                         Drop a single script into your app and instantly unlock real-time visitor insights.
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 pointer-events-auto">
-                        <Button asChild size="lg" variant="secondary">
+                        <Button asChild size="lg">
                             <Link href="/dashboard">Get Started</Link>
                         </Button>
                     </div>

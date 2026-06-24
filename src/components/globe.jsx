@@ -27,10 +27,10 @@ const globeThemes = {
     },
     dark: {
         dark: 1,
-        mapBrightness: 1.8,
+        mapBrightness: 4.2,
         markerColor: [1, 1, 1],
-        baseColor: [0.22, 0.22, 0.24],
-        glowColor: [0.08, 0.08, 0.1],
+        baseColor: [0.72, 0.72, 0.76],
+        glowColor: [0.12, 0.12, 0.14],
     },
 }
 

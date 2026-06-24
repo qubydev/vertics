@@ -6,20 +6,17 @@ const STORAGE_KEY = "vertics-theme";
 const RESOLVED_STORAGE_KEY = "vertics-resolved-theme";
 const ThemeContext = createContext(null);
 
+function isTheme(theme) {
+  return theme === "light" || theme === "dark" || theme === "system";
+}
+
+function isResolvedTheme(theme) {
+  return theme === "light" || theme === "dark";
+}
+
 function getSystemTheme() {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function getInitialTheme() {
-  if (typeof window === "undefined") return "system";
-
-  const storedTheme = window.localStorage.getItem(STORAGE_KEY);
-  if (storedTheme === "light" || storedTheme === "dark" || storedTheme === "system") {
-    return storedTheme;
-  }
-
-  return "system";
 }
 
 function setThemeCookie(name, value) {
@@ -31,9 +28,15 @@ function applyTheme(resolvedTheme) {
   document.documentElement.style.colorScheme = resolvedTheme;
 }
 
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(getInitialTheme);
-  const [systemTheme, setSystemTheme] = useState(getSystemTheme);
+export function ThemeProvider({
+  children,
+  initialTheme = "system",
+  initialResolvedTheme = "light",
+}) {
+  const [theme, setTheme] = useState(() => isTheme(initialTheme) ? initialTheme : "system");
+  const [systemTheme, setSystemTheme] = useState(() =>
+    isResolvedTheme(initialResolvedTheme) ? initialResolvedTheme : "light",
+  );
   const resolvedTheme = theme === "system" ? systemTheme : theme;
 
   useEffect(() => {

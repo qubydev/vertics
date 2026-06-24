@@ -20,16 +20,26 @@ function getInitialThemeClass(theme, resolvedTheme) {
   return "";
 }
 
+function getValidTheme(theme) {
+  if (theme === "light" || theme === "dark" || theme === "system") return theme;
+  return "system";
+}
+
+function getValidResolvedTheme(theme) {
+  if (theme === "light" || theme === "dark") return theme;
+  return "light";
+}
+
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
-  const theme = cookieStore.get("vertics-theme")?.value;
-  const resolvedTheme = cookieStore.get("vertics-resolved-theme")?.value;
+  const theme = getValidTheme(cookieStore.get("vertics-theme")?.value);
+  const resolvedTheme = getValidResolvedTheme(cookieStore.get("vertics-resolved-theme")?.value);
   const initialThemeClass = getInitialThemeClass(theme, resolvedTheme);
 
   return (
     <html lang="en" className={`${jetBrainsMono.className} ${initialThemeClass} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>
+        <ThemeProvider initialTheme={theme} initialResolvedTheme={resolvedTheme}>
           {children}
 
           <Toaster
