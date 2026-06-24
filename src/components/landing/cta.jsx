@@ -1,25 +1,36 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState, useRef } from "react";
+import { useRef, useEffect } from "react";
+
+const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+const randomString = (length) => {
+    return Array.from({ length })
+        .map(() => chars[Math.floor(Math.random() * chars.length)])
+        .join("");
+};
 
 export default function CTA() {
-    const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-    const [isHovering, setIsHovering] = useState(false);
     const containerRef = useRef(null);
+    const lettersRef = useRef(null);
+
+    useEffect(() => {
+        if (lettersRef.current) {
+            lettersRef.current.innerText = randomString(20000);
+        }
+    }, []);
 
     const handleMouseMove = (e) => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !lettersRef.current) return;
+
         const rect = containerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        const rawX = e.clientX - rect.left;
-        const rawY = e.clientY - rect.top;
-
-        const chunkSize = 15;
-        const x = Math.round(rawX / chunkSize) * chunkSize;
-        const y = Math.round(rawY / chunkSize) * chunkSize;
-
-        setMousePos({ x, y });
+        lettersRef.current.style.setProperty("--x", `${x}px`);
+        lettersRef.current.style.setProperty("--y", `${y}px`);
+        lettersRef.current.innerText = randomString(20000);
     };
 
     return (
@@ -27,27 +38,14 @@ export default function CTA() {
             <div
                 ref={containerRef}
                 onMouseMove={handleMouseMove}
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
                 className="relative border border-background/20 bg-foreground text-background p-10 md:p-16 text-center flex flex-col items-center overflow-hidden"
             >
-                {/* Pixelated Hover Gradient */}
                 <div
-                    className="absolute inset-0 pointer-events-none transition-opacity duration-500 ease-out"
+                    ref={lettersRef}
+                    className="absolute inset-0 z-0 overflow-hidden break-all font-mono text-[0.8rem] font-medium leading-none text-background/60 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none select-none"
                     style={{
-                        opacity: isHovering ? 1 : 0,
-                        // Fixed using native color-mix to add transparency to your oklch variable
-                        background: `radial-gradient(300px circle at ${mousePos.x}px ${mousePos.y}px, color-mix(in oklab, var(--background) 30%, transparent), transparent 70%)`,
-                        maskImage: `
-                            repeating-linear-gradient(to right, black 0, black 10px, transparent 10px, transparent 12px),
-                            repeating-linear-gradient(to bottom, black 0, black 10px, transparent 10px, transparent 12px)
-                        `,
-                        WebkitMaskImage: `
-                            repeating-linear-gradient(to right, black 0, black 10px, transparent 10px, transparent 12px),
-                            repeating-linear-gradient(to bottom, black 0, black 10px, transparent 10px, transparent 12px)
-                        `,
-                        WebkitMaskComposite: 'source-in',
-                        maskComposite: 'intersect',
+                        WebkitMaskImage: `radial-gradient(350px circle at var(--x, 0px) var(--y, 0px), white 20%, rgb(255 255 255 / 25%), transparent)`,
+                        maskImage: `radial-gradient(350px circle at var(--x, 0px) var(--y, 0px), white 20%, rgb(255 255 255 / 25%), transparent)`
                     }}
                 />
 
