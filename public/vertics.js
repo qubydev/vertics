@@ -96,7 +96,38 @@
     send("pageview");
 
     const startTime = Date.now();
+    let heartbeatTimer = null;
+
+    function sendHeartbeat() {
+        if (document.visibilityState === "visible") {
+            send("heartbeat");
+        }
+    }
+
+    function startHeartbeat() {
+        if (heartbeatTimer) return;
+        sendHeartbeat();
+        heartbeatTimer = setInterval(sendHeartbeat, 15000);
+    }
+
+    function stopHeartbeat() {
+        if (!heartbeatTimer) return;
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+    }
+
+    startHeartbeat();
+
+    document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+            startHeartbeat();
+        } else {
+            stopHeartbeat();
+        }
+    });
+
     window.addEventListener("pagehide", function () {
+        stopHeartbeat();
         send("pagehide", { duration: Math.round((Date.now() - startTime) / 1000) });
     });
 

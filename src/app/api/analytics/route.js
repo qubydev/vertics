@@ -61,7 +61,9 @@ export async function POST(req) {
         req.headers.get("x-real-ip") ||
         null;
 
-    const location = await getLocation(ip);
+    const location = eventName === "pageview"
+        ? await getLocation(ip)
+        : { country: null, city: null };
 
     await db.insert(analyticsEvent).values({
         id: crypto.randomUUID(),

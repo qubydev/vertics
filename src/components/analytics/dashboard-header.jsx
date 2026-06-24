@@ -14,7 +14,7 @@ import SiteLogo from "@/components/site-logo";
 import { Skeleton } from "../ui/skeleton";
 import ConnectButton from "@/components/connect-button";
 
-export function DashboardHeader({ site, timeRange, setTimeRange }) {
+export function DashboardHeader({ site, timeRange, setTimeRange, activeVisitors = 0 }) {
     const router = useRouter();
 
     return (
@@ -52,7 +52,12 @@ export function DashboardHeader({ site, timeRange, setTimeRange }) {
                 </div>
             </div>
 
-            <div className="w-full sm:w-auto flex items-center gap-2">
+            <div className="w-full sm:w-auto grid grid-cols-[auto_auto_1fr] sm:flex items-center gap-2">
+                <div className="flex h-9 items-center gap-2 border border-border bg-card px-3 text-sm font-bold uppercase tracking-tight text-foreground shrink-0">
+                    <span className="size-2 bg-emerald-500" />
+                    <span>{activeVisitors.toLocaleString()}</span>
+                    <span className="hidden sm:inline">online</span>
+                </div>
                 <ConnectButton />
                 <Select value={timeRange} onValueChange={setTimeRange}>
                     <SelectTrigger className="w-full sm:w-40 bg-card">

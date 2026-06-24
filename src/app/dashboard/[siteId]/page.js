@@ -20,6 +20,15 @@ export default function SiteStatsPage() {
         visitors: 0,
         visits: 0,
         views: 0,
+        bounceRate: 0,
+        trends: {
+            visitors: 0,
+            views: 0,
+            bounceRate: 0
+        },
+        realtime: {
+            activeVisitors: 0,
+        },
         timeseries: [],
         topPages: [],
         topReferrers: [],
@@ -30,22 +39,54 @@ export default function SiteStatsPage() {
     });
 
     useEffect(() => {
-        if (siteId) {
+        if (!siteId) return;
+
+        let cancelled = false;
+
+        const fetchStats = () => {
             fetch(`/api/stats?siteId=${siteId}&timeRange=${timeRange}`)
                 .then((res) => res.json())
                 .then((data) => {
-                    if (data.site) {
+                    if (!cancelled && data.site) {
                         setSite(data.site);
                         setStats(data.stats);
                     }
                 });
-        }
+        };
+
+        fetchStats();
+        const interval = setInterval(fetchStats, 15000);
+
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
     }, [siteId, timeRange]);
 
     const metricConfig = {
-        visitors: { label: "Unique Visitors", value: stats.visitors, dataKey: "visits" },
-        views: { label: "Page Views", value: stats.views, dataKey: "views" }
+        visitors: {
+            label: "Unique Visitors",
+            value: stats.visitors,
+            dataKey: "visits",
+            trend: stats.trends?.visitors || 0
+        },
+        views: {
+            label: "Page Views",
+            value: stats.views,
+            dataKey: "views",
+            trend: stats.trends?.views || 0
+        },
+        bounceRate: {
+            label: "Bounce Rate",
+            value: stats.bounceRate || 0,
+            dataKey: "bounceRate",
+            formatValue: (value) => `${value}%`,
+            trend: stats.trends?.bounceRate || 0,
+            trendDirection: "inverse"
+        }
     };
+
+    const activeSeriesKey = metricConfig[activeMetric]?.dataKey || metricConfig.visitors.dataKey;
 
     const visitorsByCountry = useMemo(() => {
         return (stats.topCountries || []).reduce((heatMap, country) => {
@@ -68,6 +109,7 @@ export default function SiteStatsPage() {
                 site={site}
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
+                activeVisitors={stats.realtime?.activeVisitors || 0}
             />
 
             <Card className="w-full flex flex-col">
@@ -79,7 +121,7 @@ export default function SiteStatsPage() {
                 <div className="w-full h-[360px] p-6">
                     <AnalyticsChart
                         data={stats.timeseries}
-                        activeSeriesKey={metricConfig[activeMetric].dataKey}
+                        activeSeriesKey={activeSeriesKey}
                     />
                 </div>
             </Card>

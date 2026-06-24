@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { site, analyticsEvent } from "@/db/schema";
-import { eq, and, gte, desc } from "drizzle-orm";
+import { eq, and, gte } from "drizzle-orm";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
 
@@ -89,6 +89,7 @@ export async function GET(req) {
                     sortKey: bucketKey,
                     views: 0,
                     visits: new Set(),
+                    sessionPageviews: new Map(),
                 });
             }
             return buckets;
@@ -109,6 +110,7 @@ export async function GET(req) {
                     sortKey: bucketKey,
                     views: 0,
                     visits: new Set(),
+                    sessionPageviews: new Map(),
                 });
             }
         }
@@ -127,6 +129,7 @@ export async function GET(req) {
                     sortKey: bucketKey,
                     views: 0,
                     visits: new Set(),
+                    sessionPageviews: new Map(),
                 });
             }
         }
@@ -166,19 +169,27 @@ export async function GET(req) {
         return new Date(0);
     })();
 
-    // Note: You must update your Drizzle query to match the new schema properties. 
-    // analyticsEvent.siteToken -> analyticsEvent.siteId
+    const previousStartDate = new Date(startDate.getTime() - (now.getTime() - startDate.getTime()));
+
     const events = await db.select()
         .from(analyticsEvent)
         .where(and(
             eq(analyticsEvent.siteId, targetSite.id),
-            gte(analyticsEvent.timestamp, startDate),
-            eq(analyticsEvent.eventName, "pageview") // ensure we only aggregate pageviews
+            gte(analyticsEvent.timestamp, previousStartDate)
         ));
+
+    const getEventTime = (event) => new Date(event.timestamp).getTime();
+    const currentEvents = events.filter(event => getEventTime(event) >= startDate.getTime());
+    const previousEvents = events.filter(event => {
+        const eventTime = getEventTime(event);
+        return eventTime >= previousStartDate.getTime() && eventTime < startDate.getTime();
+    });
+    const pageviewEvents = currentEvents.filter(event => event.eventName === "pageview");
 
     let views = 0;
     const uniqueSessions = new Set();
     const uniqueVisitors = new Set();
+    const sessionPageviews = new Map();
     const timeseriesMap = buildTimeseriesSeed();
     const pagesMap = new Map();
     const referrersMap = new Map();
@@ -187,9 +198,10 @@ export async function GET(req) {
     const devicesMap = new Map();
     const osMap = new Map();
 
-    events.forEach(event => {
+    pageviewEvents.forEach(event => {
         views += 1;
         uniqueSessions.add(event.sessionId);
+        sessionPageviews.set(event.sessionId, (sessionPageviews.get(event.sessionId) || 0) + 1);
 
         // Ensure visitorId exists before adding (to gracefully handle older schema data if any)
         if (event.visitorId) {
@@ -205,11 +217,13 @@ export async function GET(req) {
                 sortKey: timeKey,
                 views: 0,
                 visits: new Set(),
+                sessionPageviews: new Map(),
             });
         }
 
         const tsData = timeseriesMap.get(timeKey);
         tsData.views += 1;
+        tsData.sessionPageviews.set(event.sessionId, (tsData.sessionPageviews.get(event.sessionId) || 0) + 1);
 
         // Track unique visitors per time bucket instead of just sessions
         if (event.visitorId) {
@@ -237,13 +251,81 @@ export async function GET(req) {
         osMap.set(os, (osMap.get(os) || 0) + 1);
     });
 
+    const bouncedSessions = Array.from(sessionPageviews.values()).filter(pageviewCount => pageviewCount === 1).length;
+    const bounceRate = uniqueSessions.size > 0 ? Math.round((bouncedSessions / uniqueSessions.size) * 100) : 0;
+
+    const summarizeTrendMetrics = (rangeEvents) => {
+        const rangePageviews = rangeEvents.filter(event => event.eventName === "pageview");
+        const rangeVisitors = new Set();
+        const rangeSessions = new Set();
+        const rangeSessionPageviews = new Map();
+
+        rangePageviews.forEach(event => {
+            rangeSessions.add(event.sessionId);
+
+            if (event.visitorId) {
+                rangeVisitors.add(event.visitorId);
+            }
+
+            rangeSessionPageviews.set(event.sessionId, (rangeSessionPageviews.get(event.sessionId) || 0) + 1);
+        });
+
+        const rangeBounces = Array.from(rangeSessionPageviews.values()).filter(pageviewCount => pageviewCount === 1).length;
+
+        return {
+            visitors: rangeVisitors.size > 0 ? rangeVisitors.size : rangeSessions.size,
+            views: rangePageviews.length,
+            bounceRate: rangeSessions.size > 0 ? Math.round((rangeBounces / rangeSessions.size) * 100) : 0
+        };
+    };
+
+    const calculateChange = (current, previous) => {
+        if (previous === 0) return current === 0 ? 0 : 100;
+        return Math.round(((current - previous) / previous) * 100);
+    };
+
+    const currentTrendMetrics = {
+        visitors: uniqueVisitors.size > 0 ? uniqueVisitors.size : uniqueSessions.size,
+        views,
+        bounceRate
+    };
+    const previousTrendMetrics = summarizeTrendMetrics(previousEvents);
+    const trends = {
+        visitors: calculateChange(currentTrendMetrics.visitors, previousTrendMetrics.visitors),
+        views: calculateChange(currentTrendMetrics.views, previousTrendMetrics.views),
+        bounceRate: calculateChange(currentTrendMetrics.bounceRate, previousTrendMetrics.bounceRate)
+    };
+
+    const realtimeCutoff = new Date(now.getTime() - 5 * 60 * 1000);
+    const realtimeEventsByVisitor = new Map();
+
+    currentEvents
+        .filter(event => (
+            getEventTime(event) >= realtimeCutoff.getTime() &&
+            (event.eventName === "pageview" || event.eventName === "heartbeat")
+        ))
+        .forEach(event => {
+            const key = event.visitorId || event.sessionId;
+            const previousEvent = realtimeEventsByVisitor.get(key);
+
+            if (!previousEvent || getEventTime(event) > getEventTime(previousEvent)) {
+                realtimeEventsByVisitor.set(key, event);
+            }
+        });
+
     const timeseries = Array.from(timeseriesMap.values())
         .sort((a, b) => a.sortKey - b.sortKey)
-        .map(t => ({
-            date: t.date,
-            views: t.views,
-            visits: t.visits.size
-        }));
+        .map(t => {
+            const bucketSessions = t.visits.size;
+            const bucketBounces = Array.from(t.sessionPageviews.values()).filter(pageviewCount => pageviewCount === 1).length;
+
+            return {
+                date: t.date,
+                views: t.views,
+                visits: bucketSessions,
+                bounceRate: bucketSessions > 0 ? Math.round((bucketBounces / bucketSessions) * 100) : 0,
+            };
+        });
 
     const sortMap = (map) => Array.from(map.entries())
         .map(([name, views]) => ({ name, views }))
@@ -255,7 +337,12 @@ export async function GET(req) {
         stats: {
             views,
             visits: uniqueSessions.size,
-            visitors: uniqueVisitors.size > 0 ? uniqueVisitors.size : uniqueSessions.size, // Fallback to sessions if visitors is 0
+            visitors: currentTrendMetrics.visitors,
+            bounceRate,
+            trends,
+            realtime: {
+                activeVisitors: realtimeEventsByVisitor.size,
+            },
             timeseries,
             topPages: sortMap(pagesMap),
             topReferrers: sortMap(referrersMap),
