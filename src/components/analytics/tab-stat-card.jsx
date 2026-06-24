@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Monitor, Smartphone, Tablet, Globe } from "lucide-react";
+import { AnalyticsRowIcon } from "@/components/analytics/analytics-row-icon";
 
 export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftType = "default", rightType = "default" }) {
     const [active, setActive] = useState("left");
@@ -10,18 +10,6 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
     const data = active === "left" ? leftData : rightData;
     const currentType = active === "left" ? leftType : rightType;
     const maxVal = data.length > 0 ? Math.max(...data.map(d => d.views || 0)) : 1;
-
-    const getIcon = (type, name) => {
-        if (type === "device") {
-            if (name?.toLowerCase() === "mobile") return <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />;
-            if (name?.toLowerCase() === "tablet") return <Tablet className="w-4 h-4 text-muted-foreground shrink-0" />;
-            return <Monitor className="w-4 h-4 text-muted-foreground shrink-0" />;
-        }
-        if (type === "browser") {
-            return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
-        }
-        return null;
-    };
 
     return (
         <Card className="w-full flex flex-col h-[400px]">
@@ -62,7 +50,7 @@ export function TabStatCard({ leftTitle, rightTitle, leftData, rightData, leftTy
                                         style={{ width: `calc(${pct}% - 8px)`, opacity: 0.7 }}
                                     />
                                     <div className="flex items-center gap-3 min-w-0 flex-1 z-10">
-                                        {getIcon(currentType, item.name)}
+                                        <AnalyticsRowIcon type={currentType} name={item.name} />
                                         <span className="truncate text-sm text-foreground font-medium">{item.name || "Unknown"}</span>
                                     </div>
                                     <span className="text-sm font-medium text-foreground tabular-nums shrink-0 z-10">{item.views?.toLocaleString()}</span>

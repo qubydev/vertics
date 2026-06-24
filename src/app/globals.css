@@ -142,6 +142,6 @@
 }
 
 .world-map path:hover {
-  fill: var(--primary) !important;
+  fill: color-mix(in oklab, var(--foreground) 72%, var(--background)) !important;
   fill-opacity: 1 !important;
 }

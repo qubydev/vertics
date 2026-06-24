@@ -1,7 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, Monitor, Smartphone, Tablet } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Globe } from "lucide-react";
+import { AnalyticsRowIcon } from "@/components/analytics/analytics-row-icon";
 
 export function StatList({ title, data, metricLabel = "Visitors", type = "default" }) {
     const maxVal = data.length > 0 ? Math.max(...data.map(d => d.views || 0)) : 1;
@@ -26,10 +27,8 @@ export function StatList({ title, data, metricLabel = "Visitors", type = "defaul
             if (name === "LOCAL" || name === "Unknown" || !name) return <Globe className="w-4 h-4 text-muted-foreground shrink-0" />;
             return <img src={`https://flagcdn.com/24x18/${name.toLowerCase()}.png`} alt={name} className="w-[18px] h-[13.5px] object-cover shrink-0 shadow-sm" />;
         }
-        if (type === "device") {
-            if (name?.toLowerCase() === "mobile") return <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />;
-            if (name?.toLowerCase() === "tablet") return <Tablet className="w-4 h-4 text-muted-foreground shrink-0" />;
-            return <Monitor className="w-4 h-4 text-muted-foreground shrink-0" />;
+        if (type === "device" || type === "browser" || type === "os") {
+            return <AnalyticsRowIcon type={type} name={name} />;
         }
         return null;
     };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { StatList } from "@/components/analytics/stat-list";
@@ -8,6 +8,7 @@ import { TabStatCard } from "@/components/analytics/tab-stat-card";
 import { MetricCards } from "@/components/analytics/metric-cards";
 import { AnalyticsChart } from "@/components/analytics/analytics-chart";
 import { DashboardHeader } from "@/components/analytics/dashboard-header";
+import { WorldMap } from "@/components/world-map";
 
 export default function SiteStatsPage() {
     const params = useParams();
@@ -45,6 +46,21 @@ export default function SiteStatsPage() {
         visitors: { label: "Unique Visitors", value: stats.visitors, dataKey: "visits" },
         views: { label: "Page Views", value: stats.views, dataKey: "views" }
     };
+
+    const visitorsByCountry = useMemo(() => {
+        return (stats.topCountries || []).reduce((heatMap, country) => {
+            const code = country.name?.toUpperCase();
+
+            if (!code || code === "LOCAL" || code === "UNKNOWN") {
+                return heatMap;
+            }
+
+            heatMap[code] = country.views || 0;
+            return heatMap;
+        }, {});
+    }, [stats.topCountries]);
+
+    const totalMappedVisitors = Object.values(visitorsByCountry).reduce((total, value) => total + value, 0);
 
     return (
         <main className="w-full max-w-5xl mx-auto px-4 py-6 flex flex-col gap-8 min-h-screen bg-background">
@@ -85,6 +101,29 @@ export default function SiteStatsPage() {
                     />
                     <StatList title="Operating Systems" data={stats.topOs || []} metricLabel="Visitors" type="os" />
                 </div>
+                <Card className="w-full flex flex-col min-h-[420px]">
+                    <div className="pt-4 px-6 pb-0 space-y-0 shrink-0">
+                        <div className="flex justify-between items-end w-full border-b border-border">
+                            <div className="pb-3 text-sm font-bold uppercase tracking-tight border-b-2 border-foreground text-foreground -mb-[2px]">
+                                Visitor Map
+                            </div>
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight pb-3">
+                                {totalMappedVisitors.toLocaleString()} Visitors
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex-1 p-4 md:p-6">
+                        {totalMappedVisitors > 0 ? (
+                            <div className="w-full">
+                                <WorldMap heatMap={visitorsByCountry} aria-label="Visitor heatmap by country" />
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center min-h-[320px]">
+                                <span className="text-sm font-bold uppercase tracking-tight text-muted-foreground">No location data available</span>
+                            </div>
+                        )}
+                    </div>
+                </Card>
             </div>
         </main>
     );

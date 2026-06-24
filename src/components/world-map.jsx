@@ -3,12 +3,16 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { select } from "d3-selection";
-import { zoom } from "d3-zoom";
+import { zoom, zoomIdentity } from "d3-zoom";
+import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { countries } from "@/lib/helper";
+import { Button } from "@/components/ui/button";
 
 export const WorldMap = ({ heatMap = {}, ...props }) => {
+    const containerRef = useRef(null);
     const svgRef = useRef(null);
     const gRef = useRef(null);
+    const zoomBehaviorRef = useRef(null);
 
     const [hoveredText, setHoveredText] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -16,21 +20,19 @@ export const WorldMap = ({ heatMap = {}, ...props }) => {
 
     const getHeat = (code) => heatMap?.[code] ?? 0;
 
-    const values = Object.keys(countries).map(getHeat);
-    const maxHeat = Math.max(...values, 0);
-    const minHeat = Math.min(...values, 0);
+    const heatEntries = Object.entries(heatMap).filter(([code, heat]) => countries[code] && heat > 0);
+    const maxHeat = Math.max(...heatEntries.map(([, heat]) => heat), 0);
 
     const normalizeOpacity = (heat) => {
-        if (maxHeat === minHeat) return 1;
-        const ratio = (heat - minHeat) / (maxHeat - minHeat);
-        return 0.1 + ratio * 0.9;
+        if (!maxHeat) return 0;
+        const ratio = heat / maxHeat;
+        return 0.25 + ratio * 0.75;
     };
 
-    const dynamicStyles = Object.keys(countries)
-        .map((code) => {
-            const heat = getHeat(code);
+    const dynamicStyles = heatEntries
+        .map(([code, heat]) => {
             const opacity = normalizeOpacity(heat);
-            return `#${code} { fill: var(--primary); fill-opacity: ${opacity}; transition: fill-opacity 150ms ease; }`;
+            return `#${code} { fill: oklch(0.68 0.15 205); fill-opacity: ${opacity}; transition: fill-opacity 150ms ease; }`;
         })
         .join(" ");
 
@@ -45,15 +47,19 @@ export const WorldMap = ({ heatMap = {}, ...props }) => {
                 select(gRef.current).attr("transform", event.transform);
             });
 
+        zoomBehaviorRef.current = zoomBehavior;
         svg.call(zoomBehavior);
 
-        return () => svg.on(".zoom", null);
+        return () => {
+            zoomBehaviorRef.current = null;
+            svg.on(".zoom", null);
+        };
     }, []);
 
     const handlePointerMove = (e) => {
         if (e.pointerType !== "mouse") return;
 
-        const path = e.target?.closest?.("path");
+        const path = e.target?.tagName?.toLowerCase() === "path" ? e.target : e.target?.closest?.("path");
         const code = path?.id;
 
         if (!countries?.[code]) {
@@ -62,7 +68,11 @@ export const WorldMap = ({ heatMap = {}, ...props }) => {
         }
 
         setHoveredText(`${countries[code]}: ${getHeat(code)}`);
-        setMousePos({ x: e.clientX, y: e.clientY });
+        const bounds = containerRef.current?.getBoundingClientRect();
+        setMousePos({
+            x: bounds ? e.clientX - bounds.left : e.clientX,
+            y: bounds ? e.clientY - bounds.top : e.clientY
+        });
         setVisible(true);
     };
 
@@ -71,19 +81,37 @@ export const WorldMap = ({ heatMap = {}, ...props }) => {
         setVisible(false);
     };
 
+    const zoomBy = (scale) => {
+        if (!svgRef.current || !zoomBehaviorRef.current) return;
+        select(svgRef.current).call(zoomBehaviorRef.current.scaleBy, scale);
+    };
+
+    const resetZoom = () => {
+        if (!svgRef.current || !zoomBehaviorRef.current) return;
+        select(svgRef.current).call(zoomBehaviorRef.current.transform, zoomIdentity);
+    };
+
     return (
-        <div className="w-full aspect-square relative overflow-hidden">
-            <style>{dynamicStyles}</style>
+        <div ref={containerRef} className="w-full aspect-2/1 relative overflow-hidden">
+            <style>{`
+                .world-map path {
+                    pointer-events: all;
+                }
+
+                ${dynamicStyles}
+            `}</style>
 
             {visible && (
                 <div
                     style={{
-                        position: "fixed",
-                        transform: `translate(${mousePos.x + 12}px, ${mousePos.y + 12}px)`,
-                        background: "black",
-                        color: "white",
+                        position: "absolute",
+                        left: `${mousePos.x + 12}px`,
+                        top: `${mousePos.y + 12}px`,
+                        background: "var(--card)",
+                        color: "var(--card-foreground)",
                         padding: "6px 10px",
-                        borderRadius: "6px",
+                        border: "2px solid var(--border)",
+                        borderRadius: 0,
                         fontSize: "12px",
                         pointerEvents: "none",
                         zIndex: 9999
@@ -107,6 +135,42 @@ export const WorldMap = ({ heatMap = {}, ...props }) => {
                     <CountryPaths />
                 </g>
             </svg>
+
+            <div className="absolute bottom-3 right-3 z-10 flex border border-border bg-background shadow-sm">
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    className="border-0 border-r border-border shadow-none"
+                    aria-label="Zoom in"
+                    title="Zoom in"
+                    onClick={() => zoomBy(1.4)}
+                >
+                    <ZoomIn />
+                </Button>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    className="border-0 border-r border-border shadow-none"
+                    aria-label="Zoom out"
+                    title="Zoom out"
+                    onClick={() => zoomBy(1 / 1.4)}
+                >
+                    <ZoomOut />
+                </Button>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    className="border-0 shadow-none"
+                    aria-label="Reset map"
+                    title="Reset map"
+                    onClick={resetZoom}
+                >
+                    <RotateCcw />
+                </Button>
+            </div>
         </div>
     );
 };
