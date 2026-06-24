@@ -23,7 +23,7 @@ export default function Integration() {
 
             <div className="flex flex-col gap-10 mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-                    <div className="w-full border bg-muted">
+                    <div className="w-full bg-muted">
                         <Image
                             src="/add-website.png"
                             alt="Add your website"
@@ -58,7 +58,7 @@ export default function Integration() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-                    <div className="w-full border bg-muted md:order-last">
+                    <div className="w-full bg-muted md:order-last">
                         <Image
                             src="/copy-token.png"
                             alt="Copy Your Token"
@@ -87,7 +87,7 @@ export default function Integration() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-                    <div className="w-full border bg-muted">
+                    <div className="w-full bg-muted">
                         <Image
                             src="/add-script.png"
                             alt="Install the Script"
