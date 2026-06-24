@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import createGlobe from 'cobe'
 import { useSpring } from 'react-spring'
+import { useTheme } from './theme-provider'
 
 const analyticsMarkers = [
     { id: 'cdn-iad', location: [38.95, -77.45], region: 'iad1', click: 100 },
@@ -16,8 +17,27 @@ const analyticsMarkers = [
     { id: 'cdn-bom', location: [19.09, 72.87], region: 'bom1', click: 100 },
 ]
 
+const globeThemes = {
+    light: {
+        dark: 0,
+        mapBrightness: 10,
+        markerColor: [0, 0, 0],
+        baseColor: [1, 1, 1],
+        glowColor: [0.94, 0.93, 0.91],
+    },
+    dark: {
+        dark: 1,
+        mapBrightness: 1.8,
+        markerColor: [1, 1, 1],
+        baseColor: [0.22, 0.22, 0.24],
+        glowColor: [0.08, 0.08, 0.1],
+    },
+}
+
 export default function Globe() {
     const canvasRef = useRef(null)
+    const { resolvedTheme } = useTheme()
+    const initialResolvedTheme = useRef(resolvedTheme)
     const [clickTraffic, setClickTraffic] = useState(() =>
         analyticsMarkers.reduce((acc, marker) => {
             acc[marker.region] = marker.click
@@ -148,6 +168,9 @@ export default function Globe() {
         br: 1,
         bg: 1,
         bb: 1,
+        gr: 0.94,
+        gg: 0.93,
+        gb: 0.91,
         ar: 0.3,
         ag: 0.45,
         ab: 0.85,
@@ -162,8 +185,27 @@ export default function Globe() {
     }, [spring])
 
     useEffect(() => {
+        const theme = globeThemes[resolvedTheme]
+
+        api.start({
+            dark: theme.dark,
+            mapBrightness: theme.mapBrightness,
+            mr: theme.markerColor[0],
+            mg: theme.markerColor[1],
+            mb: theme.markerColor[2],
+            br: theme.baseColor[0],
+            bg: theme.baseColor[1],
+            bb: theme.baseColor[2],
+            gr: theme.glowColor[0],
+            gg: theme.glowColor[1],
+            gb: theme.glowColor[2],
+        })
+    }, [api, resolvedTheme])
+
+    useEffect(() => {
         if (!canvasRef.current) return
         let phi = 0
+        const theme = globeThemes[initialResolvedTheme.current]
         const width = canvasRef.current.offsetWidth
         const globe = createGlobe(canvasRef.current, {
             width,
@@ -171,13 +213,13 @@ export default function Globe() {
             devicePixelRatio: Math.min(window.devicePixelRatio, 2),
             phi: 0,
             theta: 0,
-            dark: 0,
+            dark: theme.dark,
             diffuse: 1.5,
             mapSamples: 16000,
-            mapBrightness: 10,
-            baseColor: [1, 1, 1],
-            markerColor: [0, 0, 0],
-            glowColor: [0.94, 0.93, 0.91],
+            mapBrightness: theme.mapBrightness,
+            baseColor: theme.baseColor,
+            markerColor: theme.markerColor,
+            glowColor: theme.glowColor,
             markerElevation: 0,
             markers: analyticsMarkers.map((m) => ({
                 location: m.location,
@@ -217,6 +259,7 @@ export default function Globe() {
                 mapBrightness: s.mapBrightness.get(),
                 baseColor: [s.br.get(), s.bg.get(), s.bb.get()],
                 markerColor: [s.mr.get(), s.mg.get(), s.mb.get()],
+                glowColor: [s.gr.get(), s.gg.get(), s.gb.get()],
                 markerElevation: s.markerElevation.get(),
                 markers: analyticsMarkers.map((m) => ({
                     location: m.location,
@@ -274,11 +317,11 @@ export default function Globe() {
                         }}
                     >
                         <div className="relative flex items-center justify-center w-full h-full">
-                            <div className="absolute w-full h-full rounded-full border border-black wave-effect-compact" style={{ animationDelay: '0s' }} />
-                            <div className="absolute w-full h-full rounded-full border border-black wave-effect-compact" style={{ animationDelay: '0.7s' }} />
-                            <div className="absolute w-full h-full rounded-full border border-black wave-effect-compact" style={{ animationDelay: '1.4s' }} />
-                            <div className="absolute w-2/3 h-2/3 rounded-full bg-black/20 animate-pulse" />
-                            <div className="relative w-1/3 h-1/3 rounded-full bg-black animate-pulse" />
+                            <div className="absolute w-full h-full rounded-full border border-foreground wave-effect-compact" style={{ animationDelay: '0s' }} />
+                            <div className="absolute w-full h-full rounded-full border border-foreground wave-effect-compact" style={{ animationDelay: '0.7s' }} />
+                            <div className="absolute w-full h-full rounded-full border border-foreground wave-effect-compact" style={{ animationDelay: '1.4s' }} />
+                            <div className="absolute w-2/3 h-2/3 rounded-full bg-foreground/20 animate-pulse" />
+                            <div className="relative w-1/3 h-1/3 rounded-full bg-foreground animate-pulse" />
                         </div>
                     </div>
                 )

@@ -13,15 +13,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import { LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
 import ConnectButton from "./connect-button";
 import { Skeleton } from "./ui/skeleton";
+import { useTheme } from "./theme-provider";
 
 export default function Navbar() {
     const { data: session } = authClient.useSession();
     const [isSigningOut, setIsSigningOut] = useState(false);
+    const { resolvedTheme, toggleTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
     const isAppRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
@@ -56,6 +58,21 @@ export default function Navbar() {
             {pathname.startsWith("/dashboard") && (
                 <ConnectButton />
             )}
+
+            <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={toggleTheme}
+                aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
+                title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
+            >
+                {resolvedTheme === "dark" ? (
+                    <Sun className="h-4 w-4" />
+                ) : (
+                    <Moon className="h-4 w-4" />
+                )}
+            </Button>
 
             {!isAppRoute ? (
                 <Button
