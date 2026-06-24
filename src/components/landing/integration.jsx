@@ -9,7 +9,7 @@ export default function Integration() {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
-        const snippet = '<script defer src="https://vertics.vercel.app/vertics.js" data-token="YOUR_SITE_TOKEN"></script>';
+        const snippet = '<script defer src="https://vertics.vercel.app/vertics.min.js" data-token="YOUR_SITE_TOKEN"></script>';
         navigator.clipboard.writeText(snippet);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -132,10 +132,10 @@ export default function Integration() {
                                     <span className="text-sky-300"> defer</span>
                                     <span className="text-sky-300"> src</span>
                                     <span className="text-zinc-500">=</span>
-                                    <span className="text-emerald-300">"https://vertics.vercel.app/vertics.js"</span>
+                                    <span className="text-emerald-300">{'"https://vertics.vercel.app/vertics.min.js"'}</span>
                                     <span className="text-sky-300"> data-token</span>
                                     <span className="text-zinc-500">=</span>
-                                    <span className="text-amber-400 font-bold">"YOUR_SITE_TOKEN"</span>
+                                    <span className="text-amber-400 font-bold">{'"YOUR_SITE_TOKEN"'}</span>
                                     <span className="text-zinc-500">{"></"}</span>
                                     <span className="text-pink-400">script</span>
                                     <span className="text-zinc-500">{">"}</span>

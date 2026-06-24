@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 export default function ConnectButton() {
     const [copied, setCopied] = useState(false);
 
-    const scriptCode = `<script defer src="https://vertics.vercel.app/vertics.js" data-token="YOUR_SITE_TOKEN"></script>`;
+    const scriptCode = `<script defer src="https://vertics.vercel.app/vertics.min.js" data-token="YOUR_SITE_TOKEN"></script>`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(scriptCode);
@@ -65,7 +65,7 @@ export default function ConnectButton() {
                             Install the Script
                         </h3>
                         <p className="text-sm text-muted-foreground mb-2">
-                            Paste this snippet into your website's <code className="bg-muted/50 px-1 py-0.5 text-foreground font-mono text-xs border border-border">{"<head>"}</code> section, replacing <code className="bg-muted/50 px-1 py-0.5 text-foreground font-mono text-xs font-medium border border-border">YOUR_SITE_TOKEN</code> with your copied token.
+                            Paste this snippet into your website&apos;s <code className="bg-muted/50 px-1 py-0.5 text-foreground font-mono text-xs border border-border">{"<head>"}</code> section, replacing <code className="bg-muted/50 px-1 py-0.5 text-foreground font-mono text-xs font-medium border border-border">YOUR_SITE_TOKEN</code> with your copied token.
                         </p>
 
                         <div className="relative border border-border flex flex-col">
@@ -87,10 +87,10 @@ export default function ConnectButton() {
                                     <span className="text-sky-300"> defer</span>
                                     <span className="text-sky-300"> src</span>
                                     <span className="text-zinc-500">=</span>
-                                    <span className="text-emerald-300">"https://vertics.vercel.app/vertics.js"</span>
+                                    <span className="text-emerald-300">{'"https://vertics.vercel.app/vertics.min.js"'}</span>
                                     <span className="text-sky-300"> data-token</span>
                                     <span className="text-zinc-500">=</span>
-                                    <span className="text-amber-400 font-bold">"YOUR_SITE_TOKEN"</span>
+                                    <span className="text-amber-400 font-bold">{'"YOUR_SITE_TOKEN"'}</span>
                                     <span className="text-zinc-500">{"></"}</span>
                                     <span className="text-pink-400">script</span>
                                     <span className="text-zinc-500">{">"}</span>
