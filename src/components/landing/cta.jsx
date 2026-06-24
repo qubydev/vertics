@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useRef, useEffect } from "react";
 
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -59,8 +60,8 @@ export default function CTA() {
                     </p>
 
                     <div className="mt-8 flex flex-col sm:flex-row gap-4 pointer-events-auto">
-                        <Button size="lg" variant="secondary">
-                            Get Started
+                        <Button asChild size="lg" variant="secondary">
+                            <Link href="/dashboard">Get Started</Link>
                         </Button>
                     </div>
                 </div>

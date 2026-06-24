@@ -1,4 +1,5 @@
 import Globe from "@/components/globe"
+import Link from "next/link"
 import { Button } from "../ui/button"
 
 export default function Hero() {
@@ -18,10 +19,11 @@ export default function Hero() {
                     </p>
 
                     <Button
+                        asChild
                         className="mt-2 text-sm font-medium"
                         size="lg"
                     >
-                        Get started
+                        <Link href="/dashboard">Get started</Link>
                     </Button>
                 </div>
             </div>
