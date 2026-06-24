@@ -5,7 +5,7 @@ export async function proxy(request) {
     const sessionCookie = getSessionCookie(request);
     const pathname = request.nextUrl.pathname;
 
-    const protectedRoutes = ["/dashboard"];
+    const protectedRoutes = ["/dashboard", "/admin"];
     const isProtectedRoute = protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
     if (sessionCookie && pathname === "/") {
@@ -20,5 +20,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ["/", "/dashboard/:path*"],
+    matcher: ["/", "/dashboard/:path*", "/admin/:path*"],
 };

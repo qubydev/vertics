@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { site, user } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { site } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import crypto from "crypto";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
-import { isAdminSession } from "@/lib/admin";
 
 export async function GET(req) {
     const session = await auth.api.getSession({
@@ -17,41 +16,8 @@ export async function GET(req) {
     }
 
     const userId = session.user.id;
-    const isAdmin = isAdminSession(session);
-
-    if (isAdmin) {
-        const sites = await db.select({
-            id: site.id,
-            userId: site.userId,
-            name: site.name,
-            domain: site.domain,
-            token: site.token,
-            createdAt: site.createdAt,
-            updatedAt: site.updatedAt,
-            ownerName: user.name,
-            ownerEmail: user.email,
-        })
-            .from(site)
-            .leftJoin(user, eq(site.userId, user.id))
-            .orderBy(desc(site.createdAt));
-
-        return NextResponse.json({
-            isAdmin,
-            sites: sites.map((trackedSite) => ({
-                ...trackedSite,
-                isOwner: trackedSite.userId === userId,
-            })),
-        });
-    }
-
     const sites = await db.select().from(site).where(eq(site.userId, userId));
-    return NextResponse.json({
-        isAdmin,
-        sites: sites.map((trackedSite) => ({
-            ...trackedSite,
-            isOwner: true,
-        })),
-    });
+    return NextResponse.json(sites);
 }
 
 export async function POST(req) {

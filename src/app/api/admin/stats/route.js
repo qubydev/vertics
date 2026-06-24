@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
 import { getAnalyticsStats } from "@/lib/analytics-stats";
+import { isAdminSession } from "@/lib/admin";
 
 export async function GET(req) {
     const session = await auth.api.getSession({
@@ -10,6 +11,10 @@ export async function GET(req) {
 
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!isAdminSession(session)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const siteId = req.nextUrl.searchParams.get("siteId");
@@ -22,7 +27,7 @@ export async function GET(req) {
     const data = await getAnalyticsStats({
         siteId,
         timeRange,
-        userId: session.user.id,
+        allowAnySite: true,
     });
 
     if (!data) {

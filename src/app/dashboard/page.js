@@ -19,17 +19,15 @@ import {
   Card,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { Plus, Copy, Check, Edit, Trash2, Globe, Search, Loader2, ShieldCheck, ArrowRight } from "lucide-react";
+import { Plus, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import SiteLogo from "@/components/site-logo";
+import { SiteCard } from "@/components/dashboard/site-card";
 
 export default function Dashboard() {
   const router = useRouter();
   const [sites, setSites] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState(null);
@@ -54,8 +52,7 @@ export default function Dashboard() {
       const res = await fetch("/api/site");
       if (res.ok) {
         const data = await res.json();
-        setSites(Array.isArray(data) ? data : data.sites || []);
-        setIsAdmin(Array.isArray(data) ? false : Boolean(data.isAdmin));
+        setSites(data);
       } else {
         throw new Error(`Error ${res.status}`);
       }
@@ -183,115 +180,8 @@ export default function Dashboard() {
   const filteredSites = sites.filter(
     (site) =>
       site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      site.domain.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      site.ownerEmail?.toLowerCase().includes(searchQuery.toLowerCase())
+      site.domain.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const ownSites = filteredSites.filter((site) => site.isOwner !== false);
-  const otherSites = filteredSites.filter((site) => site.isOwner === false);
-
-  function renderSiteCard(s) {
-    const isOwner = s.isOwner !== false;
-
-    return (
-      <Card
-        key={s.id}
-        onClick={() => router.push(`/dashboard/${s.id}`)}
-        className="cursor-pointer hover:bg-muted transition-colors"
-      >
-        <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-6 pb-3">
-          <SiteLogo size={40} domain={s.domain} />
-          <div className="flex flex-col gap-1 overflow-hidden">
-            <CardTitle className="text-base font-bold leading-none uppercase tracking-tight truncate">
-              {s.name}
-            </CardTitle>
-            <a
-              href={`https://${s.domain}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-sm text-muted-foreground hover:text-foreground hover:underline truncate w-fit"
-            >
-              {s.domain}
-            </a>
-            {!isOwner && (
-              <p className="text-xs text-muted-foreground truncate">
-                Owner: {s.ownerEmail || "Unknown"}
-              </p>
-            )}
-          </div>
-        </CardHeader>
-        <CardFooter className="flex items-center justify-between p-6 pt-3 mt-auto">
-          {isOwner ? (
-            <>
-              <Button
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCopy(s.token, s.id);
-                }}
-              >
-                {copiedId === s.id ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2 text-green-500" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy Token
-                  </>
-                )}
-              </Button>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingSite(s);
-                  }}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeletingSite(s);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </>
-          ) : (
-            <Button className="ml-auto" variant="outline">
-              View Analytics
-              <ArrowRight className="size-4" />
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
-    );
-  }
-
-  function renderSiteSection(title, siteList) {
-    if (siteList.length === 0) return null;
-
-    return (
-      <section className="flex flex-col gap-4">
-        {isAdmin && (
-          <h2 className="text-sm font-bold uppercase tracking-tight text-muted-foreground">
-            {title}
-          </h2>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {siteList.map((site) => renderSiteCard(site))}
-        </div>
-      </section>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col pt-18 sm:pt-24">
@@ -304,15 +194,7 @@ export default function Dashboard() {
       <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-lg font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
-              {isAdmin && (
-                <span className="inline-flex items-center gap-1.5 border border-emerald-600/25 bg-emerald-50 px-2 py-1 text-xs font-bold uppercase tracking-tight text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300">
-                  <ShieldCheck className="size-3.5" />
-                  Admin
-                </span>
-              )}
-            </div>
+            <h1 className="text-lg font-bold uppercase tracking-tight text-muted-foreground">Your Websites</h1>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -413,9 +295,18 @@ export default function Dashboard() {
             ))}
           </div>
         ) : filteredSites.length > 0 ? (
-          <div className="flex flex-col gap-8">
-            {renderSiteSection("Your Websites", ownSites)}
-            {renderSiteSection("All Websites", otherSites)}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredSites.map((s) => (
+              <SiteCard
+                key={s.id}
+                site={s}
+                copied={copiedId === s.id}
+                onOpen={() => router.push(`/dashboard/${s.id}`)}
+                onCopy={() => handleCopy(s.token, s.id)}
+                onEdit={() => setEditingSite(s)}
+                onDelete={() => setDeletingSite(s)}
+              />
+            ))}
           </div>
         ) : sites.length > 0 && filteredSites.length === 0 ? (
           <div className="flex flex-col w-full items-center justify-center py-20 text-center">

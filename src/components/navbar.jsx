@@ -24,6 +24,7 @@ export default function Navbar() {
     const [isSigningOut, setIsSigningOut] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+    const isAppRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
 
     const handleSignOut = async () => {
         if (isSigningOut) return;
@@ -56,7 +57,7 @@ export default function Navbar() {
                 <ConnectButton />
             )}
 
-            {!pathname.startsWith("/dashboard") ? (
+            {!isAppRoute ? (
                 <Button
                     onClick={() => router.push(session ? "/dashboard" : "/login")}
                 >
