@@ -2,13 +2,7 @@
 
 import { AdminSitesGrid } from "@/components/admin/admin-sites-grid";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -42,7 +36,6 @@ export function AdminTabs({ users, sites }) {
                 <Card>
                     <CardHeader className="border-b pb-6">
                         <CardTitle>Users</CardTitle>
-                        <CardDescription>Newest accounts.</CardDescription>
                     </CardHeader>
                     <CardContent className="divide-y px-0">
                         {users.map((account) => (

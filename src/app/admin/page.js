@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { desc, eq, sql } from "drizzle-orm";
-import { Activity, BarChart3, Globe, Users } from "lucide-react";
+import { BarChart3, Globe, Users } from "lucide-react";
 
 import { AdminTabs } from "@/components/admin/admin-tabs";
 import Navbar from "@/components/navbar";
@@ -29,13 +29,11 @@ function formatNumber(value) {
 }
 
 async function getAdminOverview() {
-    const activeCutoff = new Date(Date.now() - 5 * 60 * 1000);
-
     const [
         totalUsersRows,
         totalSitesRows,
         pageviewsRows,
-        activeVisitorsRows,
+        visitorsRows,
         recentUsers,
         allSites,
     ] = await Promise.all([
@@ -45,10 +43,7 @@ async function getAdminOverview() {
             .from(analyticsEvent)
             .where(eq(analyticsEvent.eventName, "pageview")),
         db.select({ value: sql`count(distinct ${analyticsEvent.visitorId})` })
-            .from(analyticsEvent)
-            .where(
-                sql`${analyticsEvent.timestamp} >= ${activeCutoff} and ${analyticsEvent.eventName} in ('pageview', 'heartbeat')`
-            ),
+            .from(analyticsEvent),
         db.select({
             id: user.id,
             name: user.name,
@@ -83,7 +78,7 @@ async function getAdminOverview() {
             users: toNumber(totalUsersRows[0]?.value),
             sites: toNumber(totalSitesRows[0]?.value),
             pageviews: toNumber(pageviewsRows[0]?.value),
-            activeVisitors: toNumber(activeVisitorsRows[0]?.value),
+            visitors: toNumber(visitorsRows[0]?.value),
         },
         recentUsers,
         sites: allSites.map((trackedSite) => ({
@@ -148,7 +143,7 @@ export default async function AdminPage() {
                     <MetricCard title="Users" value={overview.totals.users} description="Accounts" icon={Users} />
                     <MetricCard title="Sites" value={overview.totals.sites} description="Properties" icon={Globe} />
                     <MetricCard title="Views" value={overview.totals.pageviews} description="Pageviews" icon={BarChart3} />
-                    <MetricCard title="Live" value={overview.totals.activeVisitors} description="Last 5 min" icon={Activity} />
+                    <MetricCard title="Visitors" value={overview.totals.visitors} description="Unique" icon={Users} />
                 </section>
 
                 <AdminTabs users={overview.recentUsers} sites={overview.sites} />
