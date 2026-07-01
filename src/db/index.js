@@ -9,12 +9,12 @@ if (!uri) {
 
 const globalForMongo = globalThis;
 
-if (!globalForMongo.mongoClient) {
-    globalForMongo.mongoClient = new MongoClient(uri);
-}
-
-export const mongoClient = globalForMongo.mongoClient;
+export const mongoClient = globalForMongo.mongoClient ?? new MongoClient(uri);
 export const db = mongoClient.db(dbName);
+
+if (process.env.NODE_ENV !== "production") {
+    globalForMongo.mongoClient = mongoClient;
+}
 
 export const collections = {
     users: db.collection("user"),
