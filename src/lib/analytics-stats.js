@@ -1,25 +1,19 @@
 import "server-only";
 
-import { and, eq, gte } from "drizzle-orm";
-
-import { db } from "@/db";
-import { analyticsEvent, site } from "@/db/schema";
+import { collections, withoutMongoId } from "@/db";
 
 export async function getAnalyticsStats({ siteId, userId, timeRange = "7d", allowAnySite = false }) {
     const siteWhere = allowAnySite
-        ? eq(site.id, siteId)
-        : and(eq(site.id, siteId), eq(site.userId, userId));
+        ? { id: siteId }
+        : { id: siteId, userId };
 
-    const siteRecord = await db.select()
-        .from(site)
-        .where(siteWhere)
-        .limit(1);
+    const siteRecord = await collections.sites.findOne(siteWhere);
 
-    if (!siteRecord.length) {
+    if (!siteRecord) {
         return null;
     }
 
-    const targetSite = siteRecord[0];
+    const targetSite = withoutMongoId(siteRecord);
     const now = new Date();
     const pad2 = (value) => value.toString().padStart(2, "0");
 
@@ -157,12 +151,13 @@ export async function getAnalyticsStats({ siteId, userId, timeRange = "7d", allo
 
     const previousStartDate = new Date(startDate.getTime() - (now.getTime() - startDate.getTime()));
 
-    const events = await db.select()
-        .from(analyticsEvent)
-        .where(and(
-            eq(analyticsEvent.siteId, targetSite.id),
-            gte(analyticsEvent.timestamp, previousStartDate)
-        ));
+    const events = await collections.analyticsEvents
+        .find({
+            siteId: targetSite.id,
+            timestamp: { $gte: previousStartDate },
+        })
+        .project({ _id: 0 })
+        .toArray();
 
     const getEventTime = (event) => new Date(event.timestamp).getTime();
     const currentEvents = events.filter(event => getEventTime(event) >= startDate.getTime());

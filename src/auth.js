@@ -1,13 +1,12 @@
 import { betterAuth } from "better-auth";
-import { db } from "@/db";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import * as schema from "@/db/schema";
+import { db, mongoClient } from "@/db";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
 export const auth = betterAuth({
-    database: drizzleAdapter(db, {
-        provider: "pg",
-        schema: schema,
+    database: mongodbAdapter(db, {
+        client: mongoClient,
     }),
+    experimental: { joins: true },
     socialProviders: {
         github: {
             clientId: process.env.GITHUB_CLIENT_ID,

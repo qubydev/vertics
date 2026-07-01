@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { site } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { collections, withoutMongoId } from "@/db";
 import crypto from "crypto";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
@@ -16,8 +14,12 @@ export async function GET(req) {
     }
 
     const userId = session.user.id;
-    const sites = await db.select().from(site).where(eq(site.userId, userId));
-    return NextResponse.json(sites);
+    const sites = await collections.sites
+        .find({ userId })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+    return NextResponse.json(sites.map(withoutMongoId));
 }
 
 export async function POST(req) {
@@ -49,7 +51,7 @@ export async function POST(req) {
         cleanDomain = domain.replace(/^www\./, "");
     }
 
-    const newSite = await db.insert(site).values({
+    const newSite = {
         id,
         userId,
         name,
@@ -57,9 +59,11 @@ export async function POST(req) {
         token,
         createdAt: now,
         updatedAt: now,
-    }).returning();
+    };
 
-    return NextResponse.json(newSite[0]);
+    await collections.sites.insertOne(newSite);
+
+    return NextResponse.json(newSite);
 }
 
 export async function PUT(req) {
@@ -87,12 +91,17 @@ export async function PUT(req) {
         cleanDomain = domain.replace(/^www\./, "");
     }
 
-    const updatedSite = await db.update(site)
-        .set({ name, domain: cleanDomain, updatedAt: new Date() })
-        .where(and(eq(site.id, id), eq(site.userId, userId)))
-        .returning();
+    const updatedSite = await collections.sites.findOneAndUpdate(
+        { id, userId },
+        { $set: { name, domain: cleanDomain, updatedAt: new Date() } },
+        { returnDocument: "after" }
+    );
 
-    return NextResponse.json(updatedSite[0]);
+    if (!updatedSite) {
+        return NextResponse.json({ error: "Website not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(withoutMongoId(updatedSite));
 }
 
 export async function DELETE(req) {
@@ -111,6 +120,8 @@ export async function DELETE(req) {
         return NextResponse.json({ error: "Missing site ID" }, { status: 400 });
     }
 
-    await db.delete(site).where(and(eq(site.id, id), eq(site.userId, userId)));
+    await collections.analyticsEvents.deleteMany({ siteId: id });
+    await collections.sites.deleteOne({ id, userId });
+
     return NextResponse.json({ success: true });
 }

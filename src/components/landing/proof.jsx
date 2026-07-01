@@ -1,6 +1,4 @@
-import { db } from "@/db";
-import { analyticsEvent, site } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { collections } from "@/db";
 
 const formatCount = (value) => {
     const number = Number(value || 0);
@@ -13,16 +11,16 @@ const formatCount = (value) => {
 
 async function getLandingStats() {
     try {
-        const [siteCountRows, pageviewCountRows, visitorCountRows] = await Promise.all([
-            db.select({ count: sql`count(*)` }).from(site),
-            db.select({ count: sql`count(*)` }).from(analyticsEvent).where(eq(analyticsEvent.eventName, "pageview")),
-            db.select({ count: sql`count(distinct ${analyticsEvent.visitorId})` }).from(analyticsEvent).where(eq(analyticsEvent.eventName, "pageview")),
+        const [sites, pageviews, visitors] = await Promise.all([
+            collections.sites.countDocuments(),
+            collections.analyticsEvents.countDocuments({ eventName: "pageview" }),
+            collections.analyticsEvents.distinct("visitorId", { eventName: "pageview" }),
         ]);
 
         return {
-            sites: Number(siteCountRows[0]?.count || 0),
-            pageviews: Number(pageviewCountRows[0]?.count || 0),
-            visitors: Number(visitorCountRows[0]?.count || 0),
+            sites,
+            pageviews,
+            visitors: visitors.length,
         };
     } catch {
         return {

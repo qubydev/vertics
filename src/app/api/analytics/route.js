@@ -1,6 +1,4 @@
-import { db } from "@/db";
-import { analyticsEvent, site } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { collections } from "@/db";
 import crypto from "crypto";
 
 function normalizeReferrer(referrer, currentOrigin) {
@@ -37,9 +35,7 @@ export async function POST(req) {
         return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const siteRow = await db.query.site.findFirst({
-        where: eq(site.token, token),
-    });
+    const siteRow = await collections.sites.findOne({ token });
 
     if (!siteRow) {
         return Response.json({ error: "Invalid token" }, { status: 401 });
@@ -65,7 +61,7 @@ export async function POST(req) {
         ? await getLocation(ip)
         : { country: null, city: null };
 
-    await db.insert(analyticsEvent).values({
+    await collections.analyticsEvents.insertOne({
         id: crypto.randomUUID(),
         siteId: siteRow.id,
         timestamp: new Date(),

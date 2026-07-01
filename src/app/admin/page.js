@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { desc, eq, sql } from "drizzle-orm";
 import { BarChart3, Globe, Users } from "lucide-react";
 
 import { AdminTabs } from "@/components/admin/admin-tabs";
@@ -11,8 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { analyticsEvent, site, user } from "@/db/schema";
+import { collections } from "@/db";
 import { isAdminSession } from "@/lib/admin";
 import { headers } from "next/headers";
 
@@ -30,61 +28,68 @@ function formatNumber(value) {
 
 async function getAdminOverview() {
     const [
-        totalUsersRows,
-        totalSitesRows,
-        pageviewsRows,
-        visitorsRows,
+        totalUsers,
+        totalSites,
+        pageviews,
+        visitors,
         recentUsers,
         allSites,
     ] = await Promise.all([
-        db.select({ value: sql`count(*)` }).from(user),
-        db.select({ value: sql`count(*)` }).from(site),
-        db.select({ value: sql`count(*)` })
-            .from(analyticsEvent)
-            .where(eq(analyticsEvent.eventName, "pageview")),
-        db.select({ value: sql`count(distinct ${analyticsEvent.visitorId})` })
-            .from(analyticsEvent),
-        db.select({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            createdAt: user.createdAt,
-        })
-            .from(user)
-            .orderBy(desc(user.createdAt))
-            .limit(8),
-        db.select({
-            id: site.id,
-            userId: site.userId,
-            name: site.name,
-            domain: site.domain,
-            token: site.token,
-            createdAt: site.createdAt,
-            updatedAt: site.updatedAt,
-            ownerName: user.name,
-            ownerEmail: user.email,
-            events: sql`count(${analyticsEvent.id})`,
-        })
-            .from(site)
-            .leftJoin(user, eq(site.userId, user.id))
-            .leftJoin(analyticsEvent, eq(analyticsEvent.siteId, site.id))
-            .groupBy(site.id, site.userId, site.name, site.domain, site.token, site.createdAt, site.updatedAt, user.name, user.email)
-            .orderBy(desc(site.createdAt)),
+        collections.users.countDocuments(),
+        collections.sites.countDocuments(),
+        collections.analyticsEvents.countDocuments({ eventName: "pageview" }),
+        collections.analyticsEvents.distinct("visitorId"),
+        collections.users
+            .find({}, { projection: { _id: 0, id: 1, name: 1, email: 1, image: 1, createdAt: 1 } })
+            .sort({ createdAt: -1 })
+            .limit(8)
+            .toArray(),
+        collections.sites.aggregate([
+            { $sort: { createdAt: -1 } },
+            {
+                $lookup: {
+                    from: "user",
+                    localField: "userId",
+                    foreignField: "id",
+                    as: "owner",
+                },
+            },
+            { $unwind: { path: "$owner", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "analytics_event",
+                    localField: "id",
+                    foreignField: "siteId",
+                    as: "events",
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    id: 1,
+                    userId: 1,
+                    name: 1,
+                    domain: 1,
+                    token: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    ownerName: "$owner.name",
+                    ownerEmail: "$owner.email",
+                    events: { $size: "$events" },
+                },
+            },
+        ]).toArray(),
     ]);
 
     return {
         totals: {
-            users: toNumber(totalUsersRows[0]?.value),
-            sites: toNumber(totalSitesRows[0]?.value),
-            pageviews: toNumber(pageviewsRows[0]?.value),
-            visitors: toNumber(visitorsRows[0]?.value),
+            users: totalUsers,
+            sites: totalSites,
+            pageviews,
+            visitors: visitors.length,
         },
         recentUsers,
-        sites: allSites.map((trackedSite) => ({
-            ...trackedSite,
-            events: toNumber(trackedSite.events),
-        })),
+        sites: allSites,
     };
 }
 

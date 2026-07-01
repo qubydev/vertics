@@ -11,15 +11,15 @@
     "exenv": "node ./scripts/generate-env-example.js"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
-    "better-auth": "^1.6.11",
+    "@better-auth/mongo-adapter": "^1.6.19",
+    "better-auth": "^1.6.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cobe": "^2.0.1",
     "d3-selection": "^3.0.0",
     "d3-zoom": "^3.0.0",
-    "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.16.0",
+    "mongodb": "^7.4.0",
     "motion": "^12.40.0",
     "next": "16.2.6",
     "radix-ui": "^1.4.3",
@@ -36,7 +36,6 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "baseline-browser-mapping": "^2.10.31",
-    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4"
